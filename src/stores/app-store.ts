@@ -12,7 +12,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   currentPage: 'home',
-  sidebarCollapsed: false,
+  sidebarCollapsed: true,
   setCurrentPage: (page) => set({ currentPage: page }),
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),

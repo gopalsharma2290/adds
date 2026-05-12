@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useAppStore, type PageId } from '@/stores/app-store'
-import { BarChart3, Layers, ArrowUpDown, ChevronRight, Code2, Cpu, Database, Zap, Search, User, ShoppingBag, ChevronDown } from 'lucide-react'
+import { BarChart3, Layers, ArrowUpDown, ChevronRight, Code2, Cpu, Database, Zap } from 'lucide-react'
 import { useRef } from 'react'
 
 const experiments = [
@@ -60,40 +60,12 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 }
 
-const codeSymbols = [
-  { symbol: '{ }', x: 8, y: 15, delay: 0, duration: 25 },
-  { symbol: '[ ]', x: 82, y: 12, delay: 2, duration: 30 },
-  { symbol: '=>', x: 12, y: 72, delay: 4, duration: 22 },
-  { symbol: '( )', x: 78, y: 68, delay: 1, duration: 28 },
-  { symbol: '&&', x: 45, y: 8, delay: 3, duration: 26 },
-  { symbol: '||', x: 28, y: 82, delay: 5, duration: 24 },
-  { symbol: 'fn', x: 88, y: 42, delay: 2.5, duration: 27 },
-  { symbol: '< />', x: 5, y: 48, delay: 1.5, duration: 29 },
-  { symbol: '::', x: 65, y: 85, delay: 3.5, duration: 23 },
-  { symbol: '++', x: 35, y: 5, delay: 4.5, duration: 31 },
-]
-
-const particles = Array.from({ length: 20 }, (_, i) => ({
-  x: (i * 37 + 13) % 97,
-  y: (i * 53 + 7) % 89,
-  size: (i % 3) + 1,
-  duration: 15 + (i % 10),
-  delay: (i * 0.5) % 5,
-}))
-
 export function HomePage() {
   const { setCurrentPage } = useAppStore()
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 0.8], [1, 0.95])
-
-  // Parallax transforms for gradient orbs — each orb moves at a different speed
-  const orb1Y = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const orb2Y = useTransform(scrollYProgress, [0, 1], [0, -120])
-  const orb3Y = useTransform(scrollYProgress, [0, 1], [0, -40])
-  const orb4Y = useTransform(scrollYProgress, [0, 1], [0, -180])
-  const orb5Y = useTransform(scrollYProgress, [0, 1], [0, -90])
 
   return (
     <div className="relative">
@@ -106,70 +78,27 @@ export function HomePage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=2400&q=85')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2400&q=85')",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-black/35" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-900/10 to-slate-950/60" />
         <div
-          className="absolute inset-0 opacity-30 mix-blend-soft-light"
+          className="absolute inset-0 opacity-35 mix-blend-soft-light"
           style={{
-            backgroundImage: 'linear-gradient(105deg, rgba(255,255,255,0.38) 0 32%, transparent 32% 68%, rgba(255,255,255,0.28) 68% 100%)',
+            backgroundImage: 'linear-gradient(105deg, rgba(255,255,255,0.34) 0 32%, transparent 32% 68%, rgba(255,255,255,0.22) 68% 100%)',
           }}
         />
-
-        <div className="absolute left-0 right-0 top-0 z-20 h-9 overflow-hidden bg-[#171615] text-[#f7f1e6]">
-          <motion.div
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-            className="flex h-full w-max items-center gap-10 whitespace-nowrap text-[13px] font-semibold"
-          >
-            {Array.from({ length: 2 }).map((_, groupIndex) => (
-              <div key={groupIndex} className="flex items-center gap-10">
-                <span>run code in the browser</span>
-                <span>•</span>
-                <span>visualize every step</span>
-                <span>•</span>
-                <span>compare algorithms live</span>
-                <span>•</span>
-                <span>learn data structures by doing</span>
-                <span>•</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        <nav className="absolute left-0 right-0 top-9 z-20 flex h-20 items-center justify-center px-6 text-[#fff8ea]">
-          <div className="absolute left-7 text-sm font-black tracking-tight">ADDS Lab</div>
-          <div className="hidden items-center gap-9 text-sm font-bold md:flex">
-            <button onClick={() => setCurrentPage('experiment-1')} className="flex items-center gap-1">
-              analyze <ChevronDown className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={() => setCurrentPage('experiment-2')} className="flex items-center gap-1">
-              structures <ChevronDown className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={() => setCurrentPage('experiment-3')}>sorting</button>
-          </div>
-          <div className="absolute right-6 flex items-center gap-2">
-            {[Search, User, ShoppingBag].map((Icon, index) => (
-              <button
-                key={index}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/16 text-white backdrop-blur-md transition-colors hover:bg-white/28"
-              >
-                <Icon className="h-5 w-5" />
-              </button>
-            ))}
-          </div>
-        </nav>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.34),transparent_28%),radial-gradient(circle_at_82%_68%,rgba(52,211,153,0.22),transparent_26%)]" />
 
         {/* Content */}
-        <div className="relative z-10 flex min-h-screen flex-col justify-end px-6 pb-8 pt-32 md:px-8">
+        <div className="relative z-10 flex min-h-screen flex-col justify-end px-6 pb-8 pt-28 md:px-8">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-            className="pointer-events-none absolute left-4 right-4 top-[10%] text-[28vw] font-black leading-[0.72] tracking-[-0.08em] text-[#fff8ea] md:left-6 md:right-6 md:top-[8%]"
+            className="pointer-events-none absolute left-4 right-4 top-[11%] text-[27vw] font-black leading-[0.72] tracking-[-0.08em] text-[#fff8ea] md:left-6 md:right-6 md:top-[8%]"
           >
-            adds
+            ADDS
           </motion.h1>
 
           <motion.div
@@ -180,19 +109,19 @@ export function HomePage() {
           >
             <div>
               <p className="max-w-[740px] text-[clamp(3.6rem,8vw,8rem)] font-black leading-[0.84] tracking-[-0.065em] text-white">
-                the right<br />amount of logic
+                visualize<br />the workflow
               </p>
-              <div className="mt-5 flex gap-24">
-                <span className="h-16 w-16 bg-[#e65f51]" />
-                <span className="hidden h-16 w-16 bg-[#e65f51] md:block" />
-                <span className="hidden h-16 w-16 bg-[#e65f51] lg:block" />
+              <div className="mt-5 flex gap-24" aria-hidden="true">
+                <span className="h-16 w-16 bg-lavender" />
+                <span className="hidden h-16 w-16 bg-emerald-400 md:block" />
+                <span className="hidden h-16 w-16 bg-gold lg:block" />
               </div>
             </div>
             <button
               onClick={() => setCurrentPage('experiment-1')}
-              className="mb-2 w-fit rounded-full bg-[#fff8ea] px-8 py-4 text-sm font-black text-[#171615] shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-transform hover:scale-105"
+              className="mb-2 w-fit rounded-full bg-[#fff8ea] px-8 py-4 text-sm font-black text-slate-950 shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-transform hover:scale-105"
             >
-              start now
+              start analysis
             </button>
           </motion.div>
         </div>
