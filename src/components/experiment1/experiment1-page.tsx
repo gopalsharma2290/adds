@@ -389,7 +389,7 @@ export function Experiment1Page() {
   }, [output])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#fbfaf7]">
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
@@ -397,7 +397,7 @@ export function Experiment1Page() {
           <div
             className="absolute inset-0 opacity-[0.025]"
             style={{
-              backgroundImage: 'linear-gradient(rgba(167,139,250,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(167,139,250,0.6) 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
               backgroundSize: '64px 64px',
             }}
           />
@@ -413,7 +413,7 @@ export function Experiment1Page() {
             <div
               className="absolute inset-0 opacity-[0.04]"
               style={{
-                backgroundImage: 'linear-gradient(rgba(167,139,250,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(167,139,250,0.8) 1px, transparent 1px)',
+                backgroundImage: 'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
                 backgroundSize: '64px 64px',
               }}
             />
@@ -424,13 +424,13 @@ export function Experiment1Page() {
             animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.1, 0.95, 1] }}
             transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-20 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
-            style={{ background: 'rgba(167,139,250,0.08)' }}
+            style={{ background: 'rgba(217,254,232,0.75)' }}
           />
           <motion.div
             animate={{ x: [0, -30, 20, 0], y: [0, 40, -20, 0], scale: [1, 1.15, 0.9, 1] }}
             transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute top-10 -left-20 w-[400px] h-[400px] rounded-full blur-[100px]"
-            style={{ background: 'rgba(124,58,237,0.06)' }}
+            style={{ background: 'rgba(248,255,90,0.35)' }}
           />
         </div>
 

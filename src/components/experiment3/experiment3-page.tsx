@@ -24,6 +24,13 @@ type RaceMetric = {
   swaps: number
   timeMs: number
 }
+type RaceAlgorithm = 'Bubble Sort' | 'Selection Sort' | 'Insertion Sort' | 'Merge Sort'
+type RaceVisualizer = RaceMetric & {
+  values: number[]
+  active: number[]
+  sorted: boolean
+  status: string
+}
 
 const speedMap: Record<SpeedMode, number> = {
   slow: 800,
@@ -38,6 +45,27 @@ const presets = {
   reversed: [90, 78, 64, 45, 34, 33, 25, 22, 12, 11],
   nearly: [5, 11, 12, 25, 22, 34, 45, 64, 90, 78],
 }
+
+const raceComplexities: Record<RaceAlgorithm, Pick<RaceMetric, 'best' | 'average' | 'worst' | 'space'>> = {
+  'Bubble Sort': { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+  'Selection Sort': { best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+  'Insertion Sort': { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
+  'Merge Sort': { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)' },
+}
+
+const createRaceVisualizers = (values: number[]): RaceVisualizer[] => (
+  (Object.keys(raceComplexities) as RaceAlgorithm[]).map(name => ({
+    name,
+    ...raceComplexities[name],
+    values: [...values],
+    active: [],
+    sorted: false,
+    status: 'Ready',
+    comparisons: 0,
+    swaps: 0,
+    timeMs: 0,
+  }))
+)
 
 const bubbleSortCode = `def bubble_sort(arr):
     """Bubble Sort with step tracking"""
@@ -81,87 +109,6 @@ print(f"\\nPython sorted(): {sorted(arr)}")
 print("Timsort uses O(n log n) time, which is much faster than Bubble Sort's O(n²) on large lists.")
 `
 
-function runBubbleMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
-  const arr = [...values]
-  let comparisons = 0
-  let swaps = 0
-  for (let i = 0; i < arr.length - 1; i++) {
-    let swapped = false
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      comparisons += 1
-      if (arr[j] > arr[j + 1]) {
-        ;[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
-        swaps += 1
-        swapped = true
-      }
-    }
-    if (!swapped) break
-  }
-  return { comparisons, swaps }
-}
-
-function runSelectionMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
-  const arr = [...values]
-  let comparisons = 0
-  let swaps = 0
-  for (let i = 0; i < arr.length - 1; i++) {
-    let minIndex = i
-    for (let j = i + 1; j < arr.length; j++) {
-      comparisons += 1
-      if (arr[j] < arr[minIndex]) minIndex = j
-    }
-    if (minIndex !== i) {
-      ;[arr[i], arr[minIndex]] = [arr[minIndex], arr[i]]
-      swaps += 1
-    }
-  }
-  return { comparisons, swaps }
-}
-
-function runInsertionMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
-  const arr = [...values]
-  let comparisons = 0
-  let swaps = 0
-  for (let i = 1; i < arr.length; i++) {
-    const key = arr[i]
-    let j = i - 1
-    while (j >= 0) {
-      comparisons += 1
-      if (arr[j] <= key) break
-      arr[j + 1] = arr[j]
-      swaps += 1
-      j -= 1
-    }
-    arr[j + 1] = key
-  }
-  return { comparisons, swaps }
-}
-
-function runMergeMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
-  let comparisons = 0
-  let swaps = 0
-  const sort = (arr: number[]): number[] => {
-    if (arr.length <= 1) return arr
-    const mid = Math.floor(arr.length / 2)
-    const left = sort(arr.slice(0, mid))
-    const right = sort(arr.slice(mid))
-    const merged: number[] = []
-    let i = 0
-    let j = 0
-    while (i < left.length && j < right.length) {
-      comparisons += 1
-      if (left[i] <= right[j]) merged.push(left[i++])
-      else {
-        merged.push(right[j++])
-        swaps += 1
-      }
-    }
-    return [...merged, ...left.slice(i), ...right.slice(j)]
-  }
-  sort([...values])
-  return { comparisons, swaps }
-}
-
 import { UsageThoughts } from '@/components/ui/usage-thoughts'
 
 export function Experiment3Page() {
@@ -182,6 +129,8 @@ export function Experiment3Page() {
   const [currentExplanation, setCurrentExplanation] = useState('Click Sort to begin visualization.')
   const [inputDirty, setInputDirty] = useState(false)
   const [raceResults, setRaceResults] = useState<RaceMetric[]>([])
+  const [raceVisualizers, setRaceVisualizers] = useState<RaceVisualizer[]>(() => createRaceVisualizers(defaultArray))
+  const [raceRunning, setRaceRunning] = useState(false)
   const abortRef = useRef(false)
   const pausedRef = useRef(false)
 
@@ -225,6 +174,7 @@ export function Experiment3Page() {
     setPasses(0)
     setSorted(false)
     setRaceResults([])
+    setRaceVisualizers(createRaceVisualizers(nums))
     setInputDirty(false)
     setCurrentExplanation(`Applied ${nums.length} values. The chart is ready before sorting starts.`)
   }, [inputText, sorting])
@@ -246,6 +196,7 @@ export function Experiment3Page() {
     setInputText(values.join(', '))
     setArray(values.map((value, index) => ({ id: index, value, state: 'default' })))
     setRaceResults([])
+    setRaceVisualizers(createRaceVisualizers(values))
     setInputDirty(false)
     setCurrentExplanation('Preset loaded. Click Sort to compare the scenario.')
     setThoughts([`Loaded ${values.length} values. Bubble Sort behavior changes dramatically with input order.`])
@@ -359,32 +310,136 @@ export function Experiment3Page() {
     setIsThinking(false)
   }, [pyodide, pyodideRunning, code, runCode])
 
-  const runAlgorithmRace = useCallback(() => {
-    const values = array.map(item => item.value)
-    const algorithms = [
-      { name: 'Bubble Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runBubbleMetric },
-      { name: 'Selection Sort', best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runSelectionMetric },
-      { name: 'Insertion Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runInsertionMetric },
-      { name: 'Merge Sort', best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)', runner: runMergeMetric },
-    ]
-    const results = algorithms.map(algorithm => {
-      const start = performance.now()
-      const metric = algorithm.runner(values)
-      const timeMs = Math.max(0.01, performance.now() - start)
-      return {
-        name: algorithm.name,
-        best: algorithm.best,
-        average: algorithm.average,
-        worst: algorithm.worst,
-        space: algorithm.space,
-        comparisons: metric.comparisons,
-        swaps: metric.swaps,
-        timeMs,
+  const updateRaceVisualizer = useCallback((name: RaceAlgorithm, updater: (current: RaceVisualizer) => RaceVisualizer) => {
+    setRaceVisualizers(prev => prev.map(item => item.name === name ? updater(item) : item))
+  }, [])
+
+  const animateRaceAlgorithm = useCallback(async (name: RaceAlgorithm, sourceValues: number[]): Promise<RaceMetric> => {
+    const values = [...sourceValues]
+    let comparisons = 0
+    let swaps = 0
+    const started = performance.now()
+    const frameDelay = Math.max(45, speedMap[speed] / 5)
+    const publish = async (active: number[], status: string) => {
+      updateRaceVisualizer(name, current => ({
+        ...current,
+        values: [...values],
+        active,
+        status,
+        comparisons,
+        swaps,
+      }))
+      await wait(frameDelay)
+    }
+
+    if (name === 'Bubble Sort') {
+      for (let i = 0; i < values.length - 1; i++) {
+        for (let j = 0; j < values.length - i - 1; j++) {
+          comparisons += 1
+          await publish([j, j + 1], `Compare ${values[j]} and ${values[j + 1]}`)
+          if (values[j] > values[j + 1]) {
+            ;[values[j], values[j + 1]] = [values[j + 1], values[j]]
+            swaps += 1
+            await publish([j, j + 1], 'Swap adjacent values')
+          }
+        }
       }
-    })
+    }
+
+    if (name === 'Selection Sort') {
+      for (let i = 0; i < values.length - 1; i++) {
+        let minIndex = i
+        for (let j = i + 1; j < values.length; j++) {
+          comparisons += 1
+          await publish([minIndex, j], `Find minimum for slot ${i + 1}`)
+          if (values[j] < values[minIndex]) minIndex = j
+        }
+        if (minIndex !== i) {
+          ;[values[i], values[minIndex]] = [values[minIndex], values[i]]
+          swaps += 1
+          await publish([i, minIndex], 'Move minimum into place')
+        }
+      }
+    }
+
+    if (name === 'Insertion Sort') {
+      for (let i = 1; i < values.length; i++) {
+        const key = values[i]
+        let j = i - 1
+        await publish([i], `Insert ${key}`)
+        while (j >= 0) {
+          comparisons += 1
+          await publish([j, j + 1], `Compare ${values[j]} with ${key}`)
+          if (values[j] <= key) break
+          values[j + 1] = values[j]
+          swaps += 1
+          await publish([j, j + 1], 'Shift value right')
+          j -= 1
+        }
+        values[j + 1] = key
+        await publish([j + 1], 'Place key')
+      }
+    }
+
+    if (name === 'Merge Sort') {
+      const mergeSort = async (left: number, right: number): Promise<void> => {
+        if (right - left <= 1) return
+        const mid = Math.floor((left + right) / 2)
+        await mergeSort(left, mid)
+        await mergeSort(mid, right)
+        const merged: number[] = []
+        let i = left
+        let j = mid
+        while (i < mid && j < right) {
+          comparisons += 1
+          await publish([i, j], `Merge ranges ${left + 1}-${right}`)
+          if (values[i] <= values[j]) merged.push(values[i++])
+          else {
+            merged.push(values[j++])
+            swaps += 1
+          }
+        }
+        while (i < mid) merged.push(values[i++])
+        while (j < right) merged.push(values[j++])
+        merged.forEach((value, index) => {
+          values[left + index] = value
+        })
+        await publish(Array.from({ length: right - left }, (_, index) => left + index), 'Write merged range')
+      }
+      await mergeSort(0, values.length)
+    }
+
+    updateRaceVisualizer(name, current => ({
+      ...current,
+      values: [...values],
+      active: [],
+      sorted: true,
+      status: 'Sorted',
+      comparisons,
+      swaps,
+      timeMs: Math.max(0.01, performance.now() - started),
+    }))
+    return {
+      name,
+      ...raceComplexities[name],
+      comparisons,
+      swaps,
+      timeMs: Math.max(0.01, performance.now() - started),
+    }
+  }, [speed, updateRaceVisualizer, wait])
+
+  const runVisualAlgorithmRace = useCallback(async () => {
+    if (raceRunning || sorting) return
+    const values = array.map(item => item.value)
+    setRaceRunning(true)
+    setRaceResults([])
+    setRaceVisualizers(createRaceVisualizers(values))
+    setThoughts(prev => [...prev.slice(-3), 'Starting live race: four algorithms sorting the same values.'])
+    const results = await Promise.all((Object.keys(raceComplexities) as RaceAlgorithm[]).map(name => animateRaceAlgorithm(name, values)))
+    setRaceRunning(false)
     setRaceResults(results)
-    setThoughts(prev => [...prev.slice(-3), 'Algorithm race complete. Compare actual work against theoretical complexity.'])
-  }, [array])
+    setThoughts(prev => [...prev.slice(-3), 'Live algorithm race complete. Each panel used the same input array.'])
+  }, [animateRaceAlgorithm, array, raceRunning, sorting])
 
   const getBarColor = (state: SortBar['state']) => {
     switch (state) {
@@ -398,7 +453,7 @@ export function Experiment3Page() {
   const maxVal = Math.max(...array.map(b => b.value), 1)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#fbfaf7]">
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
@@ -406,7 +461,7 @@ export function Experiment3Page() {
           <div
             className="absolute inset-0 opacity-[0.025]"
             style={{
-              backgroundImage: 'linear-gradient(rgba(52,211,153,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(52,211,153,0.5) 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
               backgroundSize: '64px 64px',
             }}
           />
@@ -755,11 +810,46 @@ export function Experiment3Page() {
               </div>
               <button
                 type="button"
-                onClick={runAlgorithmRace}
-                className="px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-600 text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center gap-1.5"
+                onClick={runVisualAlgorithmRace}
+                disabled={raceRunning || sorting}
+                className="px-4 py-2 rounded-lg bg-[#062c26] text-white text-xs font-semibold hover:bg-[#0b3d35] transition-colors flex items-center gap-1.5 disabled:opacity-50"
               >
-                <Play className="w-3.5 h-3.5" /> Race
+                {raceRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                {raceRunning ? 'Racing...' : 'Live Race'}
               </button>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {raceVisualizers.map(visualizer => {
+                const visualMax = Math.max(...visualizer.values, 1)
+                return (
+                  <div key={visualizer.name} className="rounded-2xl border border-[#062c26]/10 bg-white/70 p-4 shadow-[0_14px_38px_rgba(6,44,38,0.08)]">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-black uppercase text-[#062c26]">{visualizer.name}</p>
+                        <p className="mt-1 text-[10px] font-semibold text-slate-500">{visualizer.status}</p>
+                      </div>
+                      <span className={`rounded-full px-2 py-1 text-[10px] font-black ${visualizer.sorted ? 'bg-[#d9fee8] text-[#062c26]' : 'bg-[#f8ff5a] text-[#062c26]'}`}>
+                        {visualizer.sorted ? 'DONE' : 'LIVE'}
+                      </span>
+                    </div>
+                    <div className="flex h-36 items-end gap-1.5 rounded-xl bg-[#d9fee8]/45 px-2 py-3">
+                      {visualizer.values.map((value, index) => (
+                        <motion.div
+                          key={`${visualizer.name}-${index}`}
+                          layout
+                          animate={{ height: `${(value / visualMax) * 100}%` }}
+                          className={`relative min-w-3 flex-1 rounded-t-md ${visualizer.active.includes(index) ? 'bg-[#f8ff5a]' : visualizer.sorted ? 'bg-[#10c98b]' : 'bg-[#062c26]'}`}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600">
+                      <span>Comparisons: <b className="text-[#062c26]">{visualizer.comparisons}</b></span>
+                      <span>Moves: <b className="text-[#062c26]">{visualizer.swaps}</b></span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

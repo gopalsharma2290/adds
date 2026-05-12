@@ -165,7 +165,7 @@ export function Experiment2Page() {
   }, [pyodide, isRunning, history, runCode])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#fbfaf7]">
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
@@ -173,7 +173,7 @@ export function Experiment2Page() {
           <div
             className="absolute inset-0 opacity-[0.025]"
             style={{
-              backgroundImage: 'linear-gradient(rgba(212,165,116,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(212,165,116,0.5) 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
               backgroundSize: '64px 64px',
             }}
           />
@@ -189,7 +189,7 @@ export function Experiment2Page() {
             <div
               className="absolute inset-0 opacity-[0.035]"
               style={{
-                backgroundImage: 'linear-gradient(rgba(212,165,116,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(212,165,116,0.8) 1px, transparent 1px)',
+                backgroundImage: 'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
                 backgroundSize: '64px 64px',
               }}
             />
@@ -200,7 +200,7 @@ export function Experiment2Page() {
             animate={{ x: [0, -35, 25, 0], y: [0, 25, -30, 0], scale: [1, 1.12, 0.92, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-16 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
-            style={{ background: 'rgba(212,165,116,0.07)' }}
+            style={{ background: 'rgba(248,255,90,0.32)' }}
           />
         </div>
 

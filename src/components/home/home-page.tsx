@@ -91,17 +91,20 @@ export function HomePage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.16, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-            className="grid flex-1 items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]"
+            className="flex flex-1 items-center"
           >
             <div className="relative z-20 min-w-0">
               <div className="mb-8 inline-flex rounded-lg bg-[#d9fee8] px-3 py-2 text-xs font-black uppercase text-[#062c26] shadow-[0_10px_30px_rgba(8,47,34,0.08)] sm:text-sm">
-                Algorithms for visual learners
+                Algorithms with Visual Interactions
               </div>
-              <h1 className="max-w-6xl text-[clamp(4rem,13.5vw,10.5rem)] font-black uppercase leading-[0.78] text-[#062c26]">
-                Tackle data<br />structures together
+              <h1 className="max-w-6xl text-[clamp(3.5rem,9vw,7.5rem)] font-black uppercase leading-[0.82] text-[#062c26]">
+                ADDS Jury<br />Assignment
               </h1>
+              <p className="mt-4 text-[clamp(1.5rem,3.4vw,3rem)] font-black uppercase leading-none text-[#062c26]/85">
+                Gopal Sharma - Semester 2
+              </p>
               <p className="mt-5 max-w-xl text-base font-semibold leading-7 text-slate-700 sm:mt-7">
-                ADDS Lab turns analysis, stack memory, and sorting behavior into visual workflows you can actually follow.
+                These are 3 Experiments to explore the use of analysis, stack memory, and sorting behavior.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button
@@ -121,62 +124,6 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative z-10 mx-auto w-full max-w-[460px] lg:max-w-[520px]">
-              <div className="absolute -left-10 top-28 hidden text-center font-mono text-xs uppercase tracking-wide text-slate-500 md:block">
-                <span>click to</span>
-                <br />
-                <span>step through</span>
-                <span className="ml-2 text-lg">→</span>
-              </div>
-              <div className="relative overflow-hidden rounded-[2rem] bg-[#d9fee8] p-5 shadow-[0_28px_80px_rgba(6,44,38,0.14)]">
-                <div className="absolute inset-0 opacity-35 mix-blend-multiply [background-image:radial-gradient(rgba(6,44,38,0.22)_0.8px,transparent_0.8px)] [background-size:13px_13px]" />
-                <div className="relative rounded-[1.5rem] border border-[#062c26]/15 bg-white/70 p-4 backdrop-blur-xl">
-                  <div className="mb-4 flex items-center justify-between">
-                    <p className="text-xs font-black uppercase text-[#062c26]">Live workspace</p>
-                    <div className="flex gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-[#062c26]" />
-                      <span className="h-2 w-2 rounded-full bg-lavender" />
-                      <span className="h-2 w-2 rounded-full bg-gold" />
-                    </div>
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="rounded-2xl bg-[#f8ff5a] p-4 text-[#062c26]">
-                      <div className="mb-3 flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4" />
-                        <span className="text-xs font-black uppercase">DataFrame filters</span>
-                      </div>
-                      <div className="flex h-24 items-end gap-2">
-                        {[42, 78, 55, 90, 66, 38].map((height, index) => (
-                          <span
-                            key={index}
-                            className="flex-1 rounded-t bg-[#062c26]"
-                            style={{ height: `${height}%` }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl bg-white p-4">
-                        <Layers className="mb-3 h-5 w-5 text-gold" />
-                        <p className="text-[10px] font-black uppercase text-slate-500">Stack pointer</p>
-                        <p className="mt-1 text-3xl font-black text-[#062c26]">0x04</p>
-                      </div>
-                      <div className="rounded-2xl bg-white p-4">
-                        <ArrowUpDown className="mb-3 h-5 w-5 text-emerald-500" />
-                        <p className="text-[10px] font-black uppercase text-slate-500">Sort race</p>
-                        <p className="mt-1 text-3xl font-black text-[#062c26]">4x</p>
-                      </div>
-                    </div>
-                    <div className="rounded-2xl bg-[#caa5ff] p-4 text-[#062c26]">
-                      <p className="text-xs font-black uppercase">Python runs in your browser</p>
-                      <div className="mt-3 h-2 rounded-full bg-white/60">
-                        <div className="h-full w-3/4 rounded-full bg-[#062c26]" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </motion.div>
 
           <motion.div
