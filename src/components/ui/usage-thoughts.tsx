@@ -21,7 +21,7 @@ export function UsageThoughts({ thoughts, visible, isThinking = false }: UsageTh
         >
           <div className="rounded-2xl glass p-5 border-lavender/20">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-cream flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
                 <Brain className="w-4 h-4 text-lavender" />
                 Usage Thoughts
               </h3>
@@ -48,7 +48,7 @@ export function UsageThoughts({ thoughts, visible, isThinking = false }: UsageTh
                   className="flex gap-3 group"
                 >
                   <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-lavender/40 mt-1.5 group-hover:bg-lavender group-hover:scale-125 transition-all duration-300" />
-                  <p className="text-xs text-muted-foreground group-hover:text-cream/80 transition-colors leading-relaxed">
+                  <p className="text-xs text-muted-foreground group-hover:text-slate-700 transition-colors leading-relaxed">
                     {thought}
                   </p>
                 </motion.div>
@@ -60,12 +60,12 @@ export function UsageThoughts({ thoughts, visible, isThinking = false }: UsageTh
                   className="flex gap-3"
                 >
                   <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-lavender/20 mt-1.5" />
-                  <div className="h-2 w-1/2 bg-white/[0.03] rounded-full mt-1" />
+                  <div className="h-2 w-1/2 bg-slate-50 rounded-full mt-1" />
                 </motion.div>
               )}
             </div>
             
-            <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-3 h-3 text-gold/40" />
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground/40 font-medium">Agentic Insight</span>

@@ -182,7 +182,7 @@ export function Experiment2Page() {
             <motion.button
               onClick={() => setCurrentPage('home')}
               whileHover={{ x: -3 }}
-              className="text-xs text-muted-foreground hover:text-cream transition-colors mb-6"
+              className="text-xs text-muted-foreground hover:text-slate-950 transition-colors mb-6"
             >
               ← Back to Home
             </motion.button>
@@ -200,7 +200,7 @@ export function Experiment2Page() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-cream"
+                  className="text-3xl md:text-4xl font-bold text-slate-950"
                 >
                   Stack Data Structure
                 </motion.h1>
@@ -236,7 +236,7 @@ export function Experiment2Page() {
               transition={{ delay: 0.2 }}
               className="rounded-2xl glass p-6"
             >
-              <h3 className="text-sm font-semibold text-cream mb-6 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-950 mb-6 flex items-center gap-2">
                 <Layers className="w-4 h-4 text-gold" />
                 Stack Visualization
               </h3>
@@ -258,7 +258,7 @@ export function Experiment2Page() {
                 </AnimatePresence>
 
                 {/* Stack Items */}
-                <div className="min-h-[300px] flex flex-col-reverse gap-2 p-4 rounded-xl bg-[#0a0d20] border border-white/[0.04]">
+                <div className="min-h-[300px] flex flex-col-reverse gap-2 p-4 rounded-xl bg-slate-50 border border-slate-200">
                   <AnimatePresence mode="popLayout">
                     {stack.length === 0 && (
                       <motion.div
@@ -292,10 +292,10 @@ export function Experiment2Page() {
                             ? poppingItem === item.id
                               ? 'bg-red-500/10 border-red-500/30 glow-red'
                               : 'bg-gold/10 border-gold/30 glow-gold'
-                            : 'bg-white/[0.03] border-white/[0.06]'
+                            : 'bg-slate-50 border-slate-200'
                         }`}
                       >
-                        <span className="text-lg font-bold text-cream">{item.value}</span>
+                        <span className="text-lg font-bold text-slate-950">{item.value}</span>
                         {index === stack.length - 1 && (
                           <span className="absolute right-2 text-[9px] text-gold/40">TOP</span>
                         )}
@@ -310,7 +310,7 @@ export function Experiment2Page() {
 
               {/* Size indicator */}
               <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                <span>Size: <span className="text-cream font-semibold">{stack.length}</span></span>
+                <span>Size: <span className="text-slate-950 font-semibold">{stack.length}</span></span>
                 <span>•</span>
                 <span>Complexity: <span className="text-gold font-semibold">O(1)</span></span>
               </div>
@@ -323,7 +323,7 @@ export function Experiment2Page() {
               transition={{ delay: 0.3 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-cream mb-4">Operations</h3>
+              <h3 className="text-sm font-semibold text-slate-950 mb-4">Operations</h3>
               <div className="flex gap-2 mb-4">
                 <input
                   type="number"
@@ -331,7 +331,7 @@ export function Experiment2Page() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && pushOp()}
                   placeholder="Value..."
-                  className="flex-1 px-3 py-2 rounded-lg bg-[#0a0d20] border border-white/[0.06] text-cream text-sm focus:outline-none focus:border-gold/30 transition-colors"
+                  className="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-gold/30 transition-colors"
                 />
                 <motion.button
                   onClick={pushOp}
@@ -365,7 +365,7 @@ export function Experiment2Page() {
                   onClick={reset}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-cream transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-slate-950 transition-colors flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                 </motion.button>
@@ -383,7 +383,7 @@ export function Experiment2Page() {
               className="rounded-2xl glass p-5"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-cream flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Python Code
                 </h3>
@@ -395,23 +395,23 @@ export function Experiment2Page() {
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                     isRunning
                       ? 'bg-yellow-500/20 text-yellow-400'
-                      : 'bg-gradient-to-r from-gold to-gold-muted text-navy glow-gold'
+                      : 'bg-gradient-to-r from-gold to-gold-muted text-white glow-gold'
                   }`}
                 >
                   {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                   {pyodideLoading ? 'Loading...' : isRunning ? 'Running...' : 'Run Code'}
                 </motion.button>
               </div>
-              <div className="rounded-lg overflow-hidden border border-white/[0.04]">
+              <div className="rounded-lg overflow-hidden border border-slate-200">
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full h-64 p-4 bg-[#0d1130] text-cream/90 text-xs font-mono resize-none focus:outline-none"
+                  className="w-full h-64 p-4 bg-white text-slate-800 text-xs font-mono resize-none focus:outline-none"
                   spellCheck={false}
                 />
               </div>
               {output && (
-                <div className="mt-3 p-3 rounded-lg bg-[#0a0d20] border border-white/[0.04] text-xs font-mono text-cream/70 max-h-32 overflow-y-auto">
+                <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-h-32 overflow-y-auto">
                   {output}
                 </div>
               )}
@@ -424,7 +424,7 @@ export function Experiment2Page() {
               transition={{ delay: 0.5 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-cream mb-4">Operation History</h3>
+              <h3 className="text-sm font-semibold text-slate-950 mb-4">Operation History</h3>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 <AnimatePresence>
                   {history.length === 0 && (

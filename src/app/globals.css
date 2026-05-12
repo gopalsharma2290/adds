@@ -41,51 +41,51 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-navy: #0a0e27;
-  --color-navy-light: #111640;
-  --color-lavender: #a78bfa;
-  --color-lavender-glow: #7c3aed;
-  --color-cream: #faf5eb;
-  --color-gold: #d4a574;
-  --color-gold-muted: #c9956c;
-  --color-charcoal: #1a1a2e;
-  --color-surface: #161633;
-  --color-surface-light: #1e1e45;
+  --color-navy: #f8fafc;
+  --color-navy-light: #eef2ff;
+  --color-lavender: #7c3aed;
+  --color-lavender-glow: #a78bfa;
+  --color-cream: #0f172a;
+  --color-gold: #b45309;
+  --color-gold-muted: #d97706;
+  --color-charcoal: #334155;
+  --color-surface: #ffffff;
+  --color-surface-light: #f1f5f9;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #0a0e27;
-  --foreground: #faf5eb;
-  --card: #161633;
-  --card-foreground: #faf5eb;
-  --popover: #161633;
-  --popover-foreground: #faf5eb;
-  --primary: #a78bfa;
-  --primary-foreground: #0a0e27;
-  --secondary: #1e1e45;
-  --secondary-foreground: #faf5eb;
-  --muted: #1e1e45;
-  --muted-foreground: #9ca3af;
-  --accent: #7c3aed;
-  --accent-foreground: #faf5eb;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #ede9fe;
+  --accent-foreground: #4c1d95;
   --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: #a78bfa;
-  --chart-1: #a78bfa;
-  --chart-2: #7c3aed;
-  --chart-3: #d4a574;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #7c3aed;
+  --chart-1: #7c3aed;
+  --chart-2: #a78bfa;
+  --chart-3: #b45309;
   --chart-4: #60a5fa;
   --chart-5: #34d399;
-  --sidebar: #0d1130;
-  --sidebar-foreground: #faf5eb;
-  --sidebar-primary: #a78bfa;
-  --sidebar-primary-foreground: #0a0e27;
-  --sidebar-accent: #1e1e45;
-  --sidebar-accent-foreground: #faf5eb;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #a78bfa;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #7c3aed;
 }
 
 @layer base {
@@ -93,7 +93,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-navy text-cream;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -105,31 +105,32 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(226, 232, 240, 0.7);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.3);
+  background: rgba(124, 58, 237, 0.25);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.5);
+  background: rgba(124, 58, 237, 0.45);
 }
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(22, 22, 51, 0.6);
+  background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(203, 213, 225, 0.75);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
 }
 
 .glass-light {
-  background: rgba(30, 30, 69, 0.4);
+  background: rgba(248, 250, 252, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(203, 213, 225, 0.6);
 }
 
 /* Glow effects */
@@ -199,11 +200,11 @@
 /* Custom Monaco Editor overrides */
 .monaco-editor .margin,
 .monaco-editor .monaco-editor-background {
-  background-color: #0d1130 !important;
+  background-color: #ffffff !important;
 }
 
 /* Hide default selection colors for cinematic feel */
 ::selection {
-  background: rgba(167, 139, 250, 0.3);
-  color: #faf5eb;
+  background: rgba(124, 58, 237, 0.18);
+  color: #0f172a;
 }

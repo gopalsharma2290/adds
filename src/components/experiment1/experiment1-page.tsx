@@ -232,7 +232,7 @@ export function Experiment1Page() {
             <motion.button
               onClick={() => setCurrentPage('home')}
               whileHover={{ x: -3 }}
-              className="text-xs text-muted-foreground hover:text-cream transition-colors mb-6 flex items-center gap-1"
+              className="text-xs text-muted-foreground hover:text-slate-950 transition-colors mb-6 flex items-center gap-1"
             >
               ← Back to Home
             </motion.button>
@@ -250,7 +250,7 @@ export function Experiment1Page() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-cream"
+                  className="text-3xl md:text-4xl font-bold text-slate-950"
                 >
                   Data Analysis &amp; Visualization
                 </motion.h1>
@@ -326,16 +326,16 @@ export function Experiment1Page() {
               className="rounded-2xl glass p-5"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-cream flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
                   <Database className="w-4 h-4 text-lavender" />
                   Dataset Preview
                 </h3>
                 <span className="text-[10px] text-muted-foreground">{sampleTableData.length} rows</span>
               </div>
-              <div className="max-h-64 overflow-y-auto rounded-lg border border-white/[0.04]">
+              <div className="max-h-64 overflow-y-auto rounded-lg border border-slate-200">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-white/[0.06]">
+                    <tr className="border-b border-slate-200">
                       {['Product', 'Brand', 'Price', 'Quantity'].map(h => (
                         <th key={h} className="px-3 py-2 text-left text-muted-foreground font-medium">{h}</th>
                       ))}
@@ -348,16 +348,16 @@ export function Experiment1Page() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: i * 0.03 }}
-                        className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
+                        className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
                       >
-                        <td className="px-3 py-1.5 text-cream/80">{row.Product}</td>
+                        <td className="px-3 py-1.5 text-slate-700">{row.Product}</td>
                         <td className="px-3 py-1.5">
                           <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] bg-lavender/10 text-lavender">
                             {row.Brand}
                           </span>
                         </td>
-                        <td className="px-3 py-1.5 text-cream/80">₹{row.Price}</td>
-                        <td className="px-3 py-1.5 text-cream/80">{row.Quantity}</td>
+                        <td className="px-3 py-1.5 text-slate-700">₹{row.Price}</td>
+                        <td className="px-3 py-1.5 text-slate-700">{row.Quantity}</td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -373,7 +373,7 @@ export function Experiment1Page() {
               className="rounded-2xl glass p-5"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-cream flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Python Editor
                 </h3>
@@ -382,7 +382,7 @@ export function Experiment1Page() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setCode(getDefaultCode())}
-                    className="p-1.5 rounded-lg hover:bg-white/[0.04] text-muted-foreground hover:text-cream transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-muted-foreground hover:text-slate-950 transition-colors"
                     title="Reset Code"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -395,7 +395,7 @@ export function Experiment1Page() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${
                       isRunning
                         ? 'bg-yellow-500/20 text-yellow-400'
-                        : 'bg-gradient-to-r from-lavender to-lavender-glow text-navy glow-lavender hover:shadow-[0_0_30px_rgba(167,139,250,0.3)]'
+                        : 'bg-gradient-to-r from-lavender to-lavender-glow text-white glow-lavender hover:shadow-[0_0_30px_rgba(167,139,250,0.3)]'
                     }`}
                   >
                     {isRunning ? (
@@ -408,11 +408,11 @@ export function Experiment1Page() {
                   </motion.button>
                 </div>
               </div>
-              <div className="rounded-lg overflow-hidden border border-white/[0.04]">
+              <div className="rounded-lg overflow-hidden border border-slate-200">
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full h-72 p-4 bg-[#0d1130] text-cream/90 text-xs font-mono resize-none focus:outline-none"
+                  className="w-full h-72 p-4 bg-white text-slate-800 text-xs font-mono resize-none focus:outline-none"
                   spellCheck={false}
                 />
               </div>
@@ -428,13 +428,13 @@ export function Experiment1Page() {
               transition={{ delay: 0.4 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-cream mb-4 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-gold" />
                 Output Console
               </h3>
               <div
                 ref={outputRef}
-                className="max-h-48 overflow-y-auto rounded-lg bg-[#0a0d20] border border-white/[0.04] p-3 text-xs font-mono text-cream/70"
+                className="max-h-48 overflow-y-auto rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs font-mono text-slate-600"
               >
                 {output || (
                   <span className="text-muted-foreground/50 italic">Run the code to see output...</span>
@@ -449,7 +449,7 @@ export function Experiment1Page() {
               transition={{ delay: 0.5 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-cream mb-4 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-lavender" />
                 Visualization
               </h3>
@@ -461,7 +461,7 @@ export function Experiment1Page() {
                       <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
                       <Tooltip
                         contentStyle={{
-                          background: '#161633',
+                          background: '#ffffff',
                           border: '1px solid rgba(255,255,255,0.06)',
                           borderRadius: '8px',
                           color: '#faf5eb',
@@ -495,21 +495,21 @@ export function Experiment1Page() {
             viewport={{ once: true }}
             className="rounded-2xl glass p-6"
           >
-            <h3 className="text-sm font-semibold text-cream mb-4">Learning Notes</h3>
+            <h3 className="text-sm font-semibold text-slate-950 mb-4">Learning Notes</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-gold mb-1">Why Pandas?</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Pandas provides efficient data structures (DataFrame, Series) optimized for tabular data operations like filtering, grouping, and aggregation.
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-lavender mb-1">Why GroupBy?</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   GroupBy is the split-apply-combine pattern. It splits data into groups, applies a function to each, then combines results — essential for summarization.
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-emerald-400 mb-1">Why Visualize?</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Charts transform numerical summaries into visual patterns humans can quickly interpret, revealing trends, outliers, and distributions invisible in raw numbers.

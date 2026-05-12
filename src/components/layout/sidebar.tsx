@@ -29,16 +29,16 @@ export function Sidebar() {
       initial={false}
       animate={{ width: sidebarCollapsed ? 72 : 240 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed left-0 top-0 bottom-0 z-50 flex flex-col bg-[#0d1130]/90 backdrop-blur-xl border-r border-white/[0.04]"
+      className="fixed left-0 top-0 bottom-0 z-50 flex flex-col bg-white/90 backdrop-blur-xl border-r border-slate-200"
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-white/[0.04]">
+      <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-200">
         <motion.div
           whileHover={{ rotate: 180 }}
           transition={{ duration: 0.5 }}
           className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-lavender to-lavender-glow flex items-center justify-center"
         >
-          <FlaskConical className="w-4 h-4 text-navy" />
+          <FlaskConical className="w-4 h-4 text-white" />
         </motion.div>
         <AnimatePresence>
           {!sidebarCollapsed && (
@@ -47,7 +47,7 @@ export function Sidebar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
-              className="text-sm font-semibold text-cream whitespace-nowrap"
+              className="text-sm font-semibold text-slate-950 whitespace-nowrap"
             >
               ADDS Lab
             </motion.span>
@@ -76,7 +76,7 @@ export function Sidebar() {
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 mb-0.5
                 ${currentPage === item.id
                   ? 'bg-lavender/10 text-lavender glow-lavender'
-                  : 'text-muted-foreground hover:text-cream hover:bg-white/[0.03]'
+                  : 'text-muted-foreground hover:text-slate-950 hover:bg-slate-50'
                 }
               `}
             >
@@ -109,12 +109,12 @@ export function Sidebar() {
       </nav>
 
       {/* Collapse button */}
-      <div className="p-2 border-t border-white/[0.04]">
+      <div className="p-2 border-t border-slate-200">
         <motion.button
           onClick={toggleSidebar}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-muted-foreground hover:text-cream hover:bg-white/[0.03] transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-muted-foreground hover:text-slate-950 hover:bg-slate-50 transition-colors"
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </motion.button>

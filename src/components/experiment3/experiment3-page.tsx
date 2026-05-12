@@ -251,7 +251,7 @@ export function Experiment3Page() {
             <motion.button
               onClick={() => setCurrentPage('home')}
               whileHover={{ x: -3 }}
-              className="text-xs text-muted-foreground hover:text-cream transition-colors mb-6"
+              className="text-xs text-muted-foreground hover:text-slate-950 transition-colors mb-6"
             >
               ← Back to Home
             </motion.button>
@@ -269,7 +269,7 @@ export function Experiment3Page() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-cream"
+                  className="text-3xl md:text-4xl font-bold text-slate-950"
                 >
                   Bubble Sort Visualization
                 </motion.h1>
@@ -310,7 +310,7 @@ export function Experiment3Page() {
                 onChange={(e) => setInputText(e.target.value)}
                 disabled={sorting}
                 placeholder="e.g. 5, 3, 8, 1, 9"
-                className="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-[#0a0d20] border border-white/[0.06] text-cream text-sm focus:outline-none focus:border-emerald-500/30 transition-colors disabled:opacity-50"
+                className="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-emerald-500/30 transition-colors disabled:opacity-50"
               />
               <div className="flex gap-2">
                 {!sorting ? (
@@ -318,7 +318,7 @@ export function Experiment3Page() {
                     onClick={startSort}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-navy text-sm font-semibold glow-green hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] flex items-center gap-1.5"
+                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold glow-green hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] flex items-center gap-1.5"
                   >
                     <Play className="w-3.5 h-3.5" /> Sort
                   </motion.button>
@@ -337,7 +337,7 @@ export function Experiment3Page() {
                   onClick={reset}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-cream transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-slate-950 transition-colors flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" /> Reset
                 </motion.button>
@@ -351,7 +351,7 @@ export function Experiment3Page() {
                   onClick={() => setSpeed(s)}
                   disabled={sorting}
                   className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    speed === s ? 'bg-emerald-500/20 text-emerald-400' : 'text-muted-foreground hover:text-cream'
+                    speed === s ? 'bg-emerald-500/20 text-emerald-400' : 'text-muted-foreground hover:text-slate-950'
                   } disabled:opacity-50`}
                 >
                   {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -373,7 +373,7 @@ export function Experiment3Page() {
             className="lg:col-span-2 rounded-2xl glass p-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-cream">Sorting Visualization</h3>
+              <h3 className="text-sm font-semibold text-slate-950">Sorting Visualization</h3>
             </div>
 
             <div className="flex items-end justify-center gap-2 h-64 px-4">
@@ -389,7 +389,7 @@ export function Experiment3Page() {
                     }}
                     className={`relative flex-1 max-w-[60px] rounded-t-lg transition-colors duration-200 ${getBarColor(bar.state)}`}
                   >
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-cream/60 font-mono">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-mono">
                       {bar.value}
                     </span>
                   </motion.div>
@@ -426,26 +426,26 @@ export function Experiment3Page() {
             className="space-y-4"
           >
             <div className="rounded-2xl glass p-5">
-              <h3 className="text-sm font-semibold text-cream mb-4">Live Statistics</h3>
+              <h3 className="text-sm font-semibold text-slate-950 mb-4">Live Statistics</h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03] text-center">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
                   <GitCompare className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-cream">{comparisons}</p>
+                  <p className="text-lg font-bold text-slate-950">{comparisons}</p>
                   <p className="text-[10px] text-muted-foreground">Comparisons</p>
                 </div>
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03] text-center">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
                   <ArrowLeftRight className="w-4 h-4 text-red-400 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-cream">{swaps}</p>
+                  <p className="text-lg font-bold text-slate-950">{swaps}</p>
                   <p className="text-[10px] text-muted-foreground">Swaps</p>
                 </div>
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03] text-center">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
                   <SkipForward className="w-4 h-4 text-lavender mx-auto mb-1" />
-                  <p className="text-lg font-bold text-cream">{passes}</p>
+                  <p className="text-lg font-bold text-slate-950">{passes}</p>
                   <p className="text-[10px] text-muted-foreground">Passes</p>
                 </div>
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03] text-center">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
                   <Trophy className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-cream">{sorted ? '✓' : '...'}</p>
+                  <p className="text-lg font-bold text-slate-950">{sorted ? '✓' : '...'}</p>
                   <p className="text-[10px] text-muted-foreground">Status</p>
                 </div>
               </div>
@@ -453,21 +453,21 @@ export function Experiment3Page() {
 
             {/* Complexity */}
             <div className="rounded-2xl glass p-5">
-              <h3 className="text-sm font-semibold text-cream mb-3">Complexity Analysis</h3>
+              <h3 className="text-sm font-semibold text-slate-950 mb-3">Complexity Analysis</h3>
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between p-2 rounded-lg bg-white/[0.02]">
+                <div className="flex justify-between p-2 rounded-lg bg-slate-50">
                   <span className="text-muted-foreground">Worst Case</span>
                   <span className="text-red-400 font-mono font-semibold">O(n²)</span>
                 </div>
-                <div className="flex justify-between p-2 rounded-lg bg-white/[0.02]">
+                <div className="flex justify-between p-2 rounded-lg bg-slate-50">
                   <span className="text-muted-foreground">Best Case</span>
                   <span className="text-emerald-400 font-mono font-semibold">O(n)</span>
                 </div>
-                <div className="flex justify-between p-2 rounded-lg bg-white/[0.02]">
+                <div className="flex justify-between p-2 rounded-lg bg-slate-50">
                   <span className="text-muted-foreground">Average</span>
                   <span className="text-yellow-400 font-mono font-semibold">O(n²)</span>
                 </div>
-                <div className="flex justify-between p-2 rounded-lg bg-white/[0.02]">
+                <div className="flex justify-between p-2 rounded-lg bg-slate-50">
                   <span className="text-muted-foreground">Space</span>
                   <span className="text-lavender font-mono font-semibold">O(1)</span>
                 </div>
@@ -487,7 +487,7 @@ export function Experiment3Page() {
             className="rounded-2xl glass p-5"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-cream flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 Python Implementation
               </h3>
@@ -496,7 +496,7 @@ export function Experiment3Page() {
                 disabled={!pyodide || pyodideRunning || pyodideLoading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-emerald-500 to-teal-500 text-navy"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
               >
                 {pyodideRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                 {pyodideLoading ? 'Loading...' : 'Run'}
@@ -505,11 +505,11 @@ export function Experiment3Page() {
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-64 p-4 rounded-lg bg-[#0d1130] border border-white/[0.04] text-cream/90 text-xs font-mono resize-none focus:outline-none"
+              className="w-full h-64 p-4 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs font-mono resize-none focus:outline-none"
               spellCheck={false}
             />
             {output && (
-              <div className="mt-3 p-3 rounded-lg bg-[#0a0d20] border border-white/[0.04] text-xs font-mono text-cream/70 max-h-32 overflow-y-auto">
+              <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-h-32 overflow-y-auto">
                 {output}
               </div>
             )}
@@ -521,9 +521,9 @@ export function Experiment3Page() {
             viewport={{ once: true }}
             className="rounded-2xl glass p-5"
           >
-            <h3 className="text-sm font-semibold text-cream mb-4">How Bubble Sort Works</h3>
+            <h3 className="text-sm font-semibold text-slate-950 mb-4">How Bubble Sort Works</h3>
             <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-yellow-400 mb-1 flex items-center gap-1.5">
                   <Zap className="w-3 h-3" /> Step 1: Compare
                 </p>
@@ -531,7 +531,7 @@ export function Experiment3Page() {
                   Starting from the first element, compare each pair of adjacent elements. If the left element is greater than the right, they need to be swapped.
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-red-400 mb-1 flex items-center gap-1.5">
                   <ArrowLeftRight className="w-3 h-3" /> Step 2: Swap
                 </p>
@@ -539,7 +539,7 @@ export function Experiment3Page() {
                   When a larger element is found before a smaller one, swap their positions. This &quot;bubbles&quot; the larger element toward the end of the array.
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
                 <p className="text-xs font-semibold text-emerald-400 mb-1 flex items-center gap-1.5">
                   <SkipForward className="w-3 h-3" /> Step 3: Repeat
                 </p>

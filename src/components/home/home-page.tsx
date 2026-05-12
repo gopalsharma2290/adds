@@ -169,7 +169,7 @@ export function HomePage() {
         {/* Cinematic vignette overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, transparent 0%, #0a0e27 70%)' }}
+          style={{ background: 'radial-gradient(ellipse at center, transparent 0%, rgba(248,250,252,0.9) 78%)' }}
         />
 
         {/* Floating code / algorithm symbols */}
@@ -245,12 +245,12 @@ export function HomePage() {
             transition={{ delay: 0.3, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] mb-6"
           >
-            <span className="text-cream">Visualize</span>
+            <span className="text-slate-950">Visualize</span>
             <br />
             <span className="shimmer-text inline-block bg-gradient-to-r from-lavender via-lavender-glow to-gold bg-clip-text text-transparent">
               Logic.
             </span>{' '}
-            <span className="text-cream/80">Experience</span>
+            <span className="text-slate-700">Experience</span>
             <br />
             <span className="shimmer-text inline-block bg-gradient-to-r from-gold via-lavender-glow to-lavender bg-clip-text text-transparent">
               Algorithms.
@@ -277,7 +277,7 @@ export function HomePage() {
               onClick={() => setCurrentPage('experiment-1')}
               whileHover={{ scale: 1.05, boxShadow: '0 0 50px rgba(167,139,250,0.4), 0 0 100px rgba(167,139,250,0.15)' }}
               whileTap={{ scale: 0.97 }}
-              className="group relative px-8 py-3.5 rounded-xl bg-gradient-to-r from-lavender to-lavender-glow text-navy font-semibold text-sm tracking-wide glow-lavender transition-all duration-300 overflow-hidden"
+              className="group relative px-8 py-3.5 rounded-xl bg-gradient-to-r from-lavender to-lavender-glow text-white font-semibold text-sm tracking-wide glow-lavender transition-all duration-300 overflow-hidden"
             >
               <span className="relative z-10">Start Exploring</span>
               <div className="absolute inset-0 bg-gradient-to-r from-gold/80 to-lavender-glow opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -289,7 +289,7 @@ export function HomePage() {
               }}
               whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(167,139,250,0.15), inset 0 0 30px rgba(167,139,250,0.05)' }}
               whileTap={{ scale: 0.97 }}
-              className="group relative px-8 py-3.5 rounded-xl glass text-cream/80 font-medium text-sm tracking-wide hover:text-cream transition-all duration-300 overflow-hidden"
+              className="group relative px-8 py-3.5 rounded-xl glass text-slate-700 font-medium text-sm tracking-wide hover:text-slate-950 transition-all duration-300 overflow-hidden"
             >
               <span className="relative z-10">Learn More</span>
               <div className="absolute inset-0 bg-lavender/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -328,7 +328,7 @@ export function HomePage() {
             <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.3em] text-lavender/60 mb-4">
               Experiments
             </motion.p>
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-cream mb-4">
+            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-slate-950 mb-4">
               Interactive Laboratories
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-muted-foreground max-w-xl mx-auto">
@@ -350,7 +350,7 @@ export function HomePage() {
                 variants={fadeInUp}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
                 onClick={() => setCurrentPage(exp.id)}
-                className={`group relative p-6 rounded-2xl glass cursor-pointer transition-all duration-500 ${exp.glow} hover:border-white/10`}
+                className={`group relative p-6 rounded-2xl glass cursor-pointer transition-all duration-500 ${exp.glow} hover:border-slate-200`}
               >
                 {/* Gradient overlay */}
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${exp.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -359,7 +359,7 @@ export function HomePage() {
                   <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${exp.gradient} ${exp.accent} mb-4`}>
                     {exp.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-cream mb-2">{exp.title}</h3>
+                  <h3 className="text-lg font-semibold text-slate-950 mb-2">{exp.title}</h3>
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{exp.description}</p>
                   <div className="flex items-center gap-2 text-sm font-medium text-lavender/70 group-hover:text-lavender transition-colors">
                     <span>Launch Experiment</span>
@@ -391,7 +391,7 @@ export function HomePage() {
             <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.3em] text-gold/60 mb-4">
               Technology
             </motion.p>
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-cream mb-4">
+            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-slate-950 mb-4">
               Built With Precision
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-muted-foreground max-w-xl mx-auto">
@@ -411,12 +411,12 @@ export function HomePage() {
                 key={tech.name}
                 variants={fadeInUp}
                 whileHover={{ y: -4 }}
-                className="group p-4 rounded-xl glass text-center hover:border-white/10 transition-all duration-300"
+                className="group p-4 rounded-xl glass text-center hover:border-slate-200 transition-all duration-300"
               >
                 <div className="text-lavender/60 group-hover:text-lavender transition-colors mb-3 flex justify-center">
                   {tech.icon}
                 </div>
-                <p className="text-sm font-medium text-cream">{tech.name}</p>
+                <p className="text-sm font-medium text-slate-950">{tech.name}</p>
                 <p className="text-[11px] text-muted-foreground mt-1">{tech.desc}</p>
               </motion.div>
             ))}
@@ -436,7 +436,7 @@ export function HomePage() {
             <p className="text-xs uppercase tracking-[0.3em] text-lavender/60 mb-4">
               Learning Outcomes
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold text-cream mb-8">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-950 mb-8">
               What You Will Master
             </h2>
           </motion.div>
@@ -455,9 +455,9 @@ export function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 whileHover={{ scale: 1.02 }}
-                className="p-5 rounded-xl glass hover:border-white/10 transition-all duration-300"
+                className="p-5 rounded-xl glass hover:border-slate-200 transition-all duration-300"
               >
-                <h3 className="text-sm font-semibold text-cream mb-1.5">{item.title}</h3>
+                <h3 className="text-sm font-semibold text-slate-950 mb-1.5">{item.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
@@ -466,7 +466,7 @@ export function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-8 border-t border-white/[0.04]">
+      <footer className="px-6 py-8 border-t border-slate-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
             ADDS Interactive Experiment Lab — Built for educational excellence
