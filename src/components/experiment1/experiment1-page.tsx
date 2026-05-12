@@ -1,23 +1,38 @@
 'use client'
 
-import { ChangeEvent, useState, useCallback, useRef, useEffect } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
-import { BarChart3, Play, Upload, Download, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart3, Play, Upload, Download, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw, CopyX, ArrowUpDown, PieChart as PieChartIcon, Activity as ActivityIcon } from 'lucide-react'
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
 
-const sampleCSV = `Product,Brand,Price,Quantity,Category
-T-Shirt,Nike,899,5,Apparel
-Sneakers,Adidas,2499,3,Footwear
-Jacket,Puma,1799,2,Apparel
-Shorts,Nike,599,8,Apparel
-Running Shoes,Nike,3299,1,Footwear
-Hoodie,Adidas,1299,4,Apparel
-Track Pants,Puma,999,6,Apparel
-Sports Bra,Nike,799,7,Apparel
-Cap,Adidas,499,10,Accessories
-Socks,Puma,299,15,Accessories`
+const sampleCSV = `Product,Brand,Price,Quantity,Category,Rating,Discount,InStock
+T-Shirt,Nike,899,18,Apparel,4.4,10,Yes
+Sneakers,Adidas,2499,9,Footwear,4.7,15,Yes
+Jacket,Puma,1799,6,Apparel,4.2,5,Yes
+Shorts,Nike,599,24,Apparel,4.0,20,Yes
+Running Shoes,Nike,3299,7,Footwear,4.8,12,Yes
+Hoodie,Adidas,1299,13,Apparel,4.5,18,Yes
+Track Pants,Puma,999,16,Apparel,4.1,8,Yes
+Sports Bra,Nike,799,14,Apparel,4.3,10,Yes
+Cap,Adidas,499,32,Accessories,3.9,25,Yes
+Socks,Puma,299,45,Accessories,4.0,5,Yes
+Backpack,Nike,2199,11,Accessories,4.6,14,Yes
+Slides,Adidas,1099,20,Footwear,4.2,22,Yes
+Training Tee,Puma,699,27,Apparel,4.1,18,Yes
+Windbreaker,Nike,2599,5,Apparel,4.5,7,No
+Yoga Mat,Adidas,1499,12,Accessories,4.7,10,Yes
+Gym Bag,Puma,1899,8,Accessories,4.3,16,Yes
+Basketball Shoes,Nike,4599,4,Footwear,4.9,5,No
+Compression Tights,Adidas,1599,10,Apparel,4.4,12,Yes
+Training Gloves,Puma,799,22,Accessories,4.0,30,Yes
+Rain Jacket,Nike,3499,3,Apparel,4.6,8,No
+Football Boots,Adidas,3899,6,Footwear,4.8,11,Yes
+Running Shorts,Puma,749,19,Apparel,4.2,15,Yes
+Duffel Bag,Nike,2799,7,Accessories,4.5,9,Yes
+Tennis Shoes,Adidas,2999,5,Footwear,4.4,13,Yes
+Training Socks,Puma,399,38,Accessories,3.8,20,Yes`
 
 function getDefaultCode(csvText = sampleCSV): string {
   return `import pandas as pd
@@ -81,6 +96,8 @@ const explanationSteps = [
 
 type CsvCell = string | number
 type CsvRow = Record<string, CsvCell>
+type ChartType = 'bar' | 'line' | 'area' | 'pie'
+type NumericRange = [number, number]
 
 function parseCsvRows(csvText: string): { headers: string[]; rows: CsvRow[] } {
   const lines = csvText.trim().split(/\r?\n/).filter(Boolean)
@@ -91,12 +108,19 @@ function parseCsvRows(csvText: string): { headers: string[]; rows: CsvRow[] } {
     const row: CsvRow = {}
     headers.forEach((h, i) => {
       const val = values[i]?.trim() || ''
-      const num = Number(val)
+      const num = val === '' ? NaN : Number(val)
       row[h] = isNaN(num) ? val : num
     })
     return row
   })
   return { headers, rows }
+}
+
+function rowsToCsv(headers: string[], rows: CsvRow[]): string {
+  return [
+    headers.join(','),
+    ...rows.map(row => headers.map(header => String(row[header] ?? '')).join(',')),
+  ].join('\n')
 }
 
 import { UsageThoughts } from '@/components/ui/usage-thoughts'
@@ -111,9 +135,135 @@ export function Experiment1Page() {
   const [thoughts, setThoughts] = useState<string[]>([])
   const [isThinking, setIsThinking] = useState(false)
   const [chartMetric, setChartMetric] = useState<'TotalRevenue' | 'TotalQuantity'>('TotalRevenue')
+  const [chartType, setChartType] = useState<ChartType>('bar')
+  const [filterColumn, setFilterColumn] = useState('Brand')
+  const [filterValue, setFilterValue] = useState('')
+  const [sortColumn, setSortColumn] = useState('Price')
+  const [sortAscending, setSortAscending] = useState(false)
+  const [dataLog, setDataLog] = useState<string[]>(['Dataset loaded. Ready for DataFrame operations.'])
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [priceRange, setPriceRange] = useState<NumericRange>([0, 5000])
+  const [quantityRange, setQuantityRange] = useState<NumericRange>([0, 50])
+  const [ratingRange, setRatingRange] = useState<NumericRange>([0, 5])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const outputRef = useRef<HTMLDivElement>(null)
   const { headers, rows: tableRows } = parseCsvRows(csvContent)
+
+  const numericHeaders = useMemo(() => (
+    headers.filter(header => tableRows.some(row => typeof row[header] === 'number'))
+  ), [headers, tableRows])
+
+  const cleanStats = useMemo(() => {
+    const missing = tableRows.reduce((total, row) => (
+      total + headers.filter(header => String(row[header] ?? '') === '').length
+    ), 0)
+    const duplicates = tableRows.length - new Set(tableRows.map(row => JSON.stringify(row))).size
+    const revenue = tableRows.reduce((total, row) => {
+      const price = Number(row.Price ?? 0)
+      const quantity = Number(row.Quantity ?? 0)
+      return total + price * quantity
+    }, 0)
+    return { missing, duplicates, revenue }
+  }, [headers, tableRows])
+
+  const brandOptions = useMemo(() => (
+    Array.from(new Set(tableRows.map(row => String(row.Brand ?? '')).filter(Boolean))).sort()
+  ), [tableRows])
+
+  const categoryOptions = useMemo(() => (
+    Array.from(new Set(tableRows.map(row => String(row.Category ?? '')).filter(Boolean))).sort()
+  ), [tableRows])
+
+  const displayRows = useMemo(() => {
+    const filtered = tableRows.filter(row => {
+      const textMatches = filterValue.trim()
+        ? String(row[filterColumn] ?? '').toLowerCase().includes(filterValue.toLowerCase())
+        : true
+      const brandMatches = selectedBrands.length === 0 || selectedBrands.includes(String(row.Brand ?? ''))
+      const categoryMatches = selectedCategories.length === 0 || selectedCategories.includes(String(row.Category ?? ''))
+      const price = Number(row.Price ?? 0)
+      const quantity = Number(row.Quantity ?? 0)
+      const rating = Number(row.Rating ?? 0)
+      return (
+        textMatches &&
+        brandMatches &&
+        categoryMatches &&
+        price >= priceRange[0] &&
+        price <= priceRange[1] &&
+        quantity >= quantityRange[0] &&
+        quantity <= quantityRange[1] &&
+        rating >= ratingRange[0] &&
+        rating <= ratingRange[1]
+      )
+    })
+
+    if (!sortColumn) return filtered
+    return [...filtered].sort((a, b) => {
+      const left = a[sortColumn]
+      const right = b[sortColumn]
+      const result = typeof left === 'number' && typeof right === 'number'
+        ? left - right
+        : String(left ?? '').localeCompare(String(right ?? ''))
+      return sortAscending ? result : -result
+    })
+  }, [filterColumn, filterValue, priceRange, quantityRange, ratingRange, selectedBrands, selectedCategories, sortAscending, sortColumn, tableRows])
+
+  const activeFilterCount = useMemo(() => (
+    (filterValue.trim() ? 1 : 0) +
+    selectedBrands.length +
+    selectedCategories.length +
+    (priceRange[0] > 0 || priceRange[1] < 5000 ? 1 : 0) +
+    (quantityRange[0] > 0 || quantityRange[1] < 50 ? 1 : 0) +
+    (ratingRange[0] > 0 || ratingRange[1] < 5 ? 1 : 0)
+  ), [filterValue, priceRange, quantityRange, ratingRange, selectedBrands, selectedCategories])
+
+  const filteredRevenue = useMemo(() => displayRows.reduce((total, row) => (
+    total + Number(row.Price ?? 0) * Number(row.Quantity ?? 0) * (1 - Number(row.Discount ?? 0) / 100)
+  ), 0), [displayRows])
+
+  const averagePrice = useMemo(() => (
+    displayRows.length ? displayRows.reduce((total, row) => total + Number(row.Price ?? 0), 0) / displayRows.length : 0
+  ), [displayRows])
+
+  const categoryData = useMemo(() => categoryOptions.map(category => ({
+    name: category,
+    value: displayRows.filter(row => String(row.Category ?? '') === category).length,
+  })).filter(item => item.value > 0), [categoryOptions, displayRows])
+
+  const histogramData = useMemo(() => {
+    const buckets = [
+      { name: '0-999', min: 0, max: 999 },
+      { name: '1k-1.9k', min: 1000, max: 1999 },
+      { name: '2k-2.9k', min: 2000, max: 2999 },
+      { name: '3k+', min: 3000, max: Infinity },
+    ]
+    return buckets.map(bucket => ({
+      name: bucket.name,
+      count: displayRows.filter(row => {
+        const price = Number(row.Price ?? 0)
+        return price >= bucket.min && price <= bucket.max
+      }).length,
+    }))
+  }, [displayRows])
+
+  const topBrand = useMemo(() => {
+    const totals = displayRows.reduce<Record<string, number>>((acc, row) => {
+      const brand = String(row.Brand ?? 'Unknown')
+      acc[brand] = (acc[brand] || 0) + Number(row.Price ?? 0) * Number(row.Quantity ?? 0)
+      return acc
+    }, {})
+    return Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] || '-'
+  }, [displayRows])
+
+  const applyRowsToDataset = useCallback((nextRows: CsvRow[], message: string) => {
+    const nextCsv = rowsToCsv(headers, nextRows)
+    setCsvContent(nextCsv)
+    setCode(getDefaultCode(nextCsv))
+    setChartData([])
+    setDataLog(prev => [message, ...prev].slice(0, 5))
+    setThoughts([message])
+  }, [headers])
 
   const handleRun = useCallback(async () => {
     if (!pyodide || isRunning) return
@@ -167,6 +317,7 @@ export function Experiment1Page() {
       setCsvContent(nextCsv)
       setCode(getDefaultCode(nextCsv))
       setChartData([])
+      setDataLog(prev => [`Uploaded ${file.name}. ${parseCsvRows(nextCsv).rows.length} rows available.`, ...prev].slice(0, 5))
       setThoughts([`Loaded ${file.name}. Preview and code updated from the uploaded CSV.`])
     }
     reader.readAsText(file)
@@ -187,7 +338,45 @@ export function Experiment1Page() {
     setCsvContent(sampleCSV)
     setCode(getDefaultCode(sampleCSV))
     setChartData([])
+    setFilterValue('')
+    setSelectedBrands([])
+    setSelectedCategories([])
+    setPriceRange([0, 5000])
+    setQuantityRange([0, 50])
+    setRatingRange([0, 5])
+    setSortColumn('Price')
+    setSortAscending(false)
+    setDataLog(prev => ['Reset to the sample garment dataset.', ...prev].slice(0, 5))
     setThoughts(['Restored the sample garment dataset and default analysis code.'])
+  }, [])
+
+  const removeMissingRows = useCallback(() => {
+    const cleaned = tableRows.filter(row => headers.every(header => String(row[header] ?? '') !== ''))
+    applyRowsToDataset(cleaned, `dropna() removed ${tableRows.length - cleaned.length} rows with missing values.`)
+  }, [applyRowsToDataset, headers, tableRows])
+
+  const removeDuplicateRows = useCallback(() => {
+    const seen = new Set<string>()
+    const deduped = tableRows.filter(row => {
+      const key = JSON.stringify(row)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    applyRowsToDataset(deduped, `drop_duplicates() removed ${tableRows.length - deduped.length} duplicate rows.`)
+  }, [applyRowsToDataset, tableRows])
+
+  const toggleValue = useCallback((value: string, setter: Dispatch<SetStateAction<string[]>>) => {
+    setter(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value])
+  }, [])
+
+  const clearManualFilters = useCallback(() => {
+    setFilterValue('')
+    setSelectedBrands([])
+    setSelectedCategories([])
+    setPriceRange([0, 5000])
+    setQuantityRange([0, 50])
+    setRatingRange([0, 5])
   }, [])
 
   const chartColors = ['#a78bfa', '#7c3aed', '#d4a574', '#60a5fa', '#34d399']
@@ -387,6 +576,93 @@ export function Experiment1Page() {
                   </button>
                 </div>
               </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                {[
+                  { label: 'Rows', value: tableRows.length },
+                  { label: 'Columns', value: headers.length },
+                  { label: 'Missing', value: cleanStats.missing },
+                  { label: 'Revenue', value: `₹${Math.round(cleanStats.revenue).toLocaleString()}` },
+                ].map(item => (
+                  <div key={item.label} className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                    <p className="text-[10px] text-muted-foreground">{item.label}</p>
+                    <p className="text-sm font-semibold text-slate-950">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mb-4 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-lavender" />
+                    <p className="text-xs font-semibold text-slate-950">Manual Filters</p>
+                    <span className="px-2 py-0.5 rounded-full bg-lavender/10 text-lavender text-[10px] font-semibold">
+                      {activeFilterCount} active
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearManualFilters}
+                    className="text-[10px] font-medium text-muted-foreground hover:text-slate-950"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                  {[
+                    { label: 'Max Price', value: priceRange[1], min: 0, max: 5000, setter: setPriceRange, suffix: '₹' },
+                    { label: 'Max Quantity', value: quantityRange[1], min: 0, max: 50, setter: setQuantityRange, suffix: '' },
+                    { label: 'Min Rating', value: ratingRange[0], min: 0, max: 5, setter: setRatingRange, suffix: '' },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                        <span>{item.label}</span>
+                        <span>{item.suffix}{item.value}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={item.min}
+                        max={item.max}
+                        step={item.label === 'Min Rating' ? 0.1 : 1}
+                        value={item.value}
+                        onChange={(event) => {
+                          const value = Number(event.target.value)
+                          item.setter(prev => item.label === 'Min Rating' ? [value, prev[1]] : [prev[0], value])
+                        }}
+                        className="w-full accent-violet-600"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {brandOptions.map(brand => (
+                      <button
+                        key={brand}
+                        type="button"
+                        onClick={() => toggleValue(brand, setSelectedBrands)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors ${
+                          selectedBrands.includes(brand) ? 'bg-lavender text-white' : 'bg-white border border-slate-200 text-muted-foreground hover:text-lavender'
+                        }`}
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {categoryOptions.map(category => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => toggleValue(category, setSelectedCategories)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors ${
+                          selectedCategories.includes(category) ? 'bg-gold text-white' : 'bg-white border border-slate-200 text-muted-foreground hover:text-gold'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
               <div className="max-h-64 overflow-y-auto rounded-lg border border-slate-200">
                 <table className="w-full text-xs">
                   <thead>
@@ -397,7 +673,7 @@ export function Experiment1Page() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tableRows.slice(0, 10).map((row, i) => (
+                    {displayRows.slice(0, 20).map((row, i) => (
                       <motion.tr
                         key={i}
                         initial={{ opacity: 0 }}
@@ -422,11 +698,86 @@ export function Experiment1Page() {
                     ))}
                   </tbody>
                 </table>
-                {tableRows.length > 10 && (
+                {displayRows.length > 20 && (
                   <div className="px-3 py-2 text-center text-[10px] text-muted-foreground">
-                    +{tableRows.length - 10} more rows
+                    +{displayRows.length - 20} more matching rows
                   </div>
                 )}
+              </div>
+            </motion.div>
+
+            {/* DataFrame Controls */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="rounded-2xl glass p-5"
+            >
+              <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
+                <Filter className="w-4 h-4 text-lavender" />
+                DataFrame Controls
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Filter column</label>
+                  <select
+                    value={filterColumn}
+                    onChange={(e) => setFilterColumn(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-950 focus:outline-none focus:border-lavender/40"
+                  >
+                    {headers.map(header => <option key={header}>{header}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Contains</label>
+                  <input
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                    placeholder="Try Nike or Apparel"
+                    className="mt-1 w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-950 focus:outline-none focus:border-lavender/40"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Sort by</label>
+                  <select
+                    value={sortColumn}
+                    onChange={(e) => setSortColumn(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-950 focus:outline-none focus:border-lavender/40"
+                  >
+                    {headers.map(header => <option key={header}>{header}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSortAscending(prev => !prev)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-lavender/10 text-lavender text-xs font-medium hover:bg-lavender/20 transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    {sortAscending ? 'Ascending' : 'Descending'}
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={removeMissingRows}
+                  className="px-3 py-2 rounded-lg bg-gold/10 text-gold text-xs font-medium hover:bg-gold/20 transition-colors flex items-center gap-1.5"
+                >
+                  <Filter className="w-3.5 h-3.5" /> Drop Missing
+                </button>
+                <button
+                  type="button"
+                  onClick={removeDuplicateRows}
+                  className="px-3 py-2 rounded-lg bg-red-500/10 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
+                >
+                  <CopyX className="w-3.5 h-3.5" /> Remove Duplicates ({cleanStats.duplicates})
+                </button>
+              </div>
+              <div className="mt-4 rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-1">
+                {dataLog.map((log, index) => (
+                  <p key={`${log}-${index}`} className="text-[11px] text-muted-foreground font-mono">{log}</p>
+                ))}
               </div>
             </motion.div>
 
@@ -486,6 +837,81 @@ export function Experiment1Page() {
 
           {/* Right Column */}
           <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="grid grid-cols-2 gap-3"
+            >
+              {[
+                { label: 'Filtered Revenue', value: `₹${Math.round(filteredRevenue).toLocaleString()}`, accent: 'text-lavender' },
+                { label: 'Avg Price', value: `₹${Math.round(averagePrice).toLocaleString()}`, accent: 'text-gold' },
+                { label: 'Top Brand', value: topBrand, accent: 'text-emerald-500' },
+                { label: 'Visible Rows', value: `${displayRows.length}/${tableRows.length}`, accent: 'text-slate-950' },
+              ].map(card => (
+                <div key={card.label} className="rounded-2xl glass p-4">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">{card.label}</p>
+                  <p className={`text-lg font-bold ${card.accent}`}>{card.value}</p>
+                  <div className="mt-3 flex h-5 items-end gap-1">
+                    {[0.35, 0.7, 0.5, 0.9, 0.62].map((height, index) => (
+                      <div
+                        key={index}
+                        className="flex-1 rounded-t bg-lavender/20"
+                        style={{ height: `${height * 100}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.38 }}
+              className="rounded-2xl glass p-5"
+            >
+              <h3 className="text-sm font-semibold text-slate-950 mb-4">Filtered Dataset Visuals</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="h-44 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                  <p className="text-[10px] text-muted-foreground mb-2">Category Split</p>
+                  <ResponsiveContainer width="100%" height="88%">
+                    <PieChart>
+                      <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: 12 }} />
+                      <Pie data={categoryData} dataKey="value" nameKey="name" innerRadius="48%" outerRadius="78%" paddingAngle={4}>
+                        {categoryData.map((_, index) => (
+                          <Cell key={index} fill={chartColors[index % chartColors.length]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="h-44 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                  <p className="text-[10px] text-muted-foreground mb-2">Price Distribution</p>
+                  <ResponsiveContainer width="100%" height="88%">
+                    <BarChart data={histogramData}>
+                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} allowDecimals={false} />
+                      <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: 12 }} />
+                      <Bar dataKey="count" fill="#7c3aed" radius={[5, 5, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="md:col-span-2 h-48 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                  <p className="text-[10px] text-muted-foreground mb-2">Price vs Quantity</p>
+                  <ResponsiveContainer width="100%" height="88%">
+                    <ScatterChart>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="Price" name="Price" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis dataKey="Quantity" name="Quantity" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: 12 }} />
+                      <Scatter data={displayRows} fill="#d4a574" />
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Output Console */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -537,37 +963,85 @@ export function Experiment1Page() {
                   ))}
                 </div>
               </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {([
+                  ['bar', BarChart3, 'Bar'],
+                  ['line', TrendingUp, 'Line'],
+                  ['area', ActivityIcon, 'Area'],
+                  ['pie', PieChartIcon, 'Pie'],
+                ] as const).map(([type, Icon, label]) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setChartType(type)}
+                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors flex items-center gap-1.5 ${
+                      chartType === type ? 'bg-lavender/10 text-lavender' : 'bg-slate-50 text-muted-foreground hover:text-slate-950'
+                    }`}
+                  >
+                    <Icon className="w-3 h-3" />
+                    {label}
+                  </button>
+                ))}
+              </div>
               <div className="h-64">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} barSize={40}>
-                      <XAxis dataKey="Brand" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis
-                        stroke="#9ca3af"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => chartMetric === 'TotalRevenue' ? `₹${Number(value) / 1000}K` : String(value)}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: '#ffffff',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                          color: '#0f172a',
-                          fontSize: 12,
-                        }}
-                        formatter={(value: number) => [
-                          chartMetric === 'TotalRevenue' ? `₹${value.toLocaleString()}` : value.toLocaleString(),
-                          chartMetric === 'TotalRevenue' ? 'Revenue' : 'Quantity',
-                        ]}
-                      />
-                      <Bar dataKey={chartMetric} radius={[6, 6, 0, 0]}>
-                        {chartData.map((_, index) => (
-                          <Cell key={index} fill={chartColors[index % chartColors.length]} />
-                        ))}
-                      </Bar>
-                    </BarChart>
+                    {chartType === 'line' ? (
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis dataKey="Brand" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                        <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: 12 }} />
+                        <Line type="monotone" dataKey={chartMetric} stroke="#a78bfa" strokeWidth={2} dot={{ r: 4, fill: '#a78bfa' }} />
+                      </LineChart>
+                    ) : chartType === 'area' ? (
+                      <AreaChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis dataKey="Brand" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                        <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: 12 }} />
+                        <Area type="monotone" dataKey={chartMetric} stroke="#a78bfa" fill="rgba(167,139,250,0.16)" strokeWidth={2} />
+                      </AreaChart>
+                    ) : chartType === 'pie' ? (
+                      <PieChart>
+                        <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: 12 }} />
+                        <Pie data={chartData} dataKey={chartMetric} nameKey="Brand" innerRadius="55%" outerRadius="82%" paddingAngle={3}>
+                          {chartData.map((_, index) => (
+                            <Cell key={index} fill={chartColors[index % chartColors.length]} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    ) : (
+                      <BarChart data={chartData} barSize={40}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis dataKey="Brand" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis
+                          stroke="#9ca3af"
+                          fontSize={11}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => chartMetric === 'TotalRevenue' ? `₹${Number(value) / 1000}K` : String(value)}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            color: '#0f172a',
+                            fontSize: 12,
+                          }}
+                          formatter={(value: number) => [
+                            chartMetric === 'TotalRevenue' ? `₹${value.toLocaleString()}` : value.toLocaleString(),
+                            chartMetric === 'TotalRevenue' ? 'Revenue' : 'Quantity',
+                          ]}
+                        />
+                        <Bar dataKey={chartMetric} radius={[6, 6, 0, 0]}>
+                          {chartData.map((_, index) => (
+                            <Cell key={index} fill={chartColors[index % chartColors.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    )}
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground/30 text-sm">

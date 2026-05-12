@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { ArrowUpDown, Play, Pause, RotateCcw, SkipForward, Loader2, Zap, GitCompare, ArrowLeftRight, Trophy } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 interface SortBar {
   id: number
@@ -13,6 +14,16 @@ interface SortBar {
 }
 
 type SpeedMode = 'slow' | 'medium' | 'fast'
+type RaceMetric = {
+  name: string
+  best: string
+  average: string
+  worst: string
+  space: string
+  comparisons: number
+  swaps: number
+  timeMs: number
+}
 
 const speedMap: Record<SpeedMode, number> = {
   slow: 800,
@@ -21,6 +32,12 @@ const speedMap: Record<SpeedMode, number> = {
 }
 
 const defaultArray = [64, 34, 25, 12, 22, 11, 90, 45, 78, 33]
+const presets = {
+  random: [64, 34, 25, 12, 22, 11, 90, 45, 78, 33],
+  sorted: [5, 11, 12, 22, 25, 34, 45, 64, 78, 90],
+  reversed: [90, 78, 64, 45, 34, 33, 25, 22, 12, 11],
+  nearly: [5, 11, 12, 25, 22, 34, 45, 64, 90, 78],
+}
 
 const bubbleSortCode = `def bubble_sort(arr):
     """Bubble Sort with step tracking"""
@@ -64,6 +81,87 @@ print(f"\\nPython sorted(): {sorted(arr)}")
 print("Timsort uses O(n log n) time, which is much faster than Bubble Sort's O(n²) on large lists.")
 `
 
+function runBubbleMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
+  const arr = [...values]
+  let comparisons = 0
+  let swaps = 0
+  for (let i = 0; i < arr.length - 1; i++) {
+    let swapped = false
+    for (let j = 0; j < arr.length - i - 1; j++) {
+      comparisons += 1
+      if (arr[j] > arr[j + 1]) {
+        ;[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
+        swaps += 1
+        swapped = true
+      }
+    }
+    if (!swapped) break
+  }
+  return { comparisons, swaps }
+}
+
+function runSelectionMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
+  const arr = [...values]
+  let comparisons = 0
+  let swaps = 0
+  for (let i = 0; i < arr.length - 1; i++) {
+    let minIndex = i
+    for (let j = i + 1; j < arr.length; j++) {
+      comparisons += 1
+      if (arr[j] < arr[minIndex]) minIndex = j
+    }
+    if (minIndex !== i) {
+      ;[arr[i], arr[minIndex]] = [arr[minIndex], arr[i]]
+      swaps += 1
+    }
+  }
+  return { comparisons, swaps }
+}
+
+function runInsertionMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
+  const arr = [...values]
+  let comparisons = 0
+  let swaps = 0
+  for (let i = 1; i < arr.length; i++) {
+    const key = arr[i]
+    let j = i - 1
+    while (j >= 0) {
+      comparisons += 1
+      if (arr[j] <= key) break
+      arr[j + 1] = arr[j]
+      swaps += 1
+      j -= 1
+    }
+    arr[j + 1] = key
+  }
+  return { comparisons, swaps }
+}
+
+function runMergeMetric(values: number[]): Omit<RaceMetric, 'name' | 'best' | 'average' | 'worst' | 'space' | 'timeMs'> {
+  let comparisons = 0
+  let swaps = 0
+  const sort = (arr: number[]): number[] => {
+    if (arr.length <= 1) return arr
+    const mid = Math.floor(arr.length / 2)
+    const left = sort(arr.slice(0, mid))
+    const right = sort(arr.slice(mid))
+    const merged: number[] = []
+    let i = 0
+    let j = 0
+    while (i < left.length && j < right.length) {
+      comparisons += 1
+      if (left[i] <= right[j]) merged.push(left[i++])
+      else {
+        merged.push(right[j++])
+        swaps += 1
+      }
+    }
+    return [...merged, ...left.slice(i), ...right.slice(j)]
+  }
+  sort([...values])
+  return { comparisons, swaps }
+}
+
 import { UsageThoughts } from '@/components/ui/usage-thoughts'
 
 export function Experiment3Page() {
@@ -82,8 +180,19 @@ export function Experiment3Page() {
   const [sorted, setSorted] = useState(false)
   const [code, setCode] = useState(bubbleSortCode)
   const [currentExplanation, setCurrentExplanation] = useState('Click Sort to begin visualization.')
+  const [inputDirty, setInputDirty] = useState(false)
+  const [raceResults, setRaceResults] = useState<RaceMetric[]>([])
   const abortRef = useRef(false)
   const pausedRef = useRef(false)
+
+  const algorithmComparison = useMemo(() => {
+    const n = array.length
+    const bubbleWorst = Math.max(0, (n * (n - 1)) / 2)
+    const bubbleBest = Math.max(0, n - 1)
+    const nLogN = n > 1 ? Math.ceil(n * Math.log2(n)) : 0
+    const speedup = nLogN > 0 ? Math.max(1, Math.round(bubbleWorst / nLogN)) : 1
+    return { n, bubbleWorst, bubbleBest, nLogN, speedup }
+  }, [array])
 
   // Keep pausedRef in sync
   useEffect(() => {
@@ -105,6 +214,42 @@ export function Experiment3Page() {
       setArray(nums.map((v, i) => ({ id: i, value: v, state: 'default' })))
     }
   }, [inputText])
+
+  const applyInput = useCallback((nextText = inputText) => {
+    const nums = nextText.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n))
+    if (nums.length === 0 || sorting) return
+    abortRef.current = true
+    setArray(nums.map((v, i) => ({ id: i, value: v, state: 'default' })))
+    setComparisons(0)
+    setSwaps(0)
+    setPasses(0)
+    setSorted(false)
+    setRaceResults([])
+    setInputDirty(false)
+    setCurrentExplanation(`Applied ${nums.length} values. The chart is ready before sorting starts.`)
+  }, [inputText, sorting])
+
+  const handleInputChange = useCallback((nextText: string) => {
+    setInputText(nextText)
+    setInputDirty(true)
+    if (!sorting) applyInput(nextText)
+  }, [applyInput, sorting])
+
+  const applyPreset = useCallback((values: number[]) => {
+    abortRef.current = true
+    setSorting(false)
+    setPaused(false)
+    setComparisons(0)
+    setSwaps(0)
+    setPasses(0)
+    setSorted(false)
+    setInputText(values.join(', '))
+    setArray(values.map((value, index) => ({ id: index, value, state: 'default' })))
+    setRaceResults([])
+    setInputDirty(false)
+    setCurrentExplanation('Preset loaded. Click Sort to compare the scenario.')
+    setThoughts([`Loaded ${values.length} values. Bubble Sort behavior changes dramatically with input order.`])
+  }, [])
 
   const wait = useCallback((ms: number) => new Promise<void>(resolve => {
     const check = () => {
@@ -213,6 +358,33 @@ export function Experiment3Page() {
     await runCode(code)
     setIsThinking(false)
   }, [pyodide, pyodideRunning, code, runCode])
+
+  const runAlgorithmRace = useCallback(() => {
+    const values = array.map(item => item.value)
+    const algorithms = [
+      { name: 'Bubble Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runBubbleMetric },
+      { name: 'Selection Sort', best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runSelectionMetric },
+      { name: 'Insertion Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', runner: runInsertionMetric },
+      { name: 'Merge Sort', best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)', runner: runMergeMetric },
+    ]
+    const results = algorithms.map(algorithm => {
+      const start = performance.now()
+      const metric = algorithm.runner(values)
+      const timeMs = Math.max(0.01, performance.now() - start)
+      return {
+        name: algorithm.name,
+        best: algorithm.best,
+        average: algorithm.average,
+        worst: algorithm.worst,
+        space: algorithm.space,
+        comparisons: metric.comparisons,
+        swaps: metric.swaps,
+        timeMs,
+      }
+    })
+    setRaceResults(results)
+    setThoughts(prev => [...prev.slice(-3), 'Algorithm race complete. Compare actual work against theoretical complexity.'])
+  }, [array])
 
   const getBarColor = (state: SortBar['state']) => {
     switch (state) {
@@ -330,12 +502,24 @@ export function Experiment3Page() {
               <input
                 type="text"
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && applyInput()}
                 disabled={sorting}
                 placeholder="e.g. 5, 3, 8, 1, 9"
                 className="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-emerald-500/30 transition-colors disabled:opacity-50"
               />
               <div className="flex gap-2">
+                <motion.button
+                  onClick={() => applyInput()}
+                  disabled={sorting}
+                  animate={inputDirty ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.8, repeat: inputDirty ? Infinity : 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold hover:text-emerald-600 transition-colors disabled:opacity-50"
+                >
+                  Apply
+                </motion.button>
                 {!sorting ? (
                   <motion.button
                     onClick={startSort}
@@ -378,6 +562,25 @@ export function Experiment3Page() {
                   } disabled:opacity-50`}
                 >
                   {s.charAt(0).toUpperCase() + s.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Presets:</span>
+              {([
+                ['random', 'Random'],
+                ['sorted', 'Sorted'],
+                ['reversed', 'Reversed'],
+                ['nearly', 'Nearly Sorted'],
+              ] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => applyPreset(presets[key])}
+                  disabled={sorting}
+                  className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-muted-foreground hover:text-slate-950 disabled:opacity-50 transition-colors"
+                >
+                  {label}
                 </button>
               ))}
             </div>
@@ -503,6 +706,111 @@ export function Experiment3Page() {
                   <span className="text-muted-foreground">Space</span>
                   <span className="text-lavender font-mono font-semibold">O(1)</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl glass p-5">
+              <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
+                <GitCompare className="w-4 h-4 text-emerald-400" />
+                Algorithm Comparison
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <p className="text-[10px] text-muted-foreground">Bubble worst</p>
+                  <p className="text-lg font-bold text-red-400">{algorithmComparison.bubbleWorst}</p>
+                  <p className="text-[10px] text-muted-foreground">comparisons</p>
+                </div>
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <p className="text-[10px] text-muted-foreground">n log n est.</p>
+                  <p className="text-lg font-bold text-emerald-400">{algorithmComparison.nLogN}</p>
+                  <p className="text-[10px] text-muted-foreground">steps</p>
+                </div>
+              </div>
+              <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-3">
+                <p className="text-xs text-emerald-600 font-semibold">{algorithmComparison.speedup}x fewer comparison-scale steps</p>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  On {algorithmComparison.n} values, efficient production sort routines are already ahead; the gap grows fast as inventory records scale.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="px-6 pb-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl glass p-5"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-emerald-400" />
+                  Algorithm Race
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">Run four algorithms on the same current array and compare real work counts.</p>
+              </div>
+              <button
+                type="button"
+                onClick={runAlgorithmRace}
+                className="px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-600 text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center gap-1.5"
+              >
+                <Play className="w-3.5 h-3.5" /> Race
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-xs">
+                  <thead className="bg-slate-50 text-muted-foreground">
+                    <tr>
+                      {['Algorithm', 'Best', 'Avg', 'Worst', 'Space', 'Comparisons', 'Swaps', 'Time'].map(header => (
+                        <th key={header} className="px-3 py-2 text-left font-medium">{header}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(raceResults.length ? raceResults : [
+                      { name: 'Bubble Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', comparisons: 0, swaps: 0, timeMs: 0 },
+                      { name: 'Selection Sort', best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', comparisons: 0, swaps: 0, timeMs: 0 },
+                      { name: 'Insertion Sort', best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)', comparisons: 0, swaps: 0, timeMs: 0 },
+                      { name: 'Merge Sort', best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)', comparisons: 0, swaps: 0, timeMs: 0 },
+                    ]).map(result => (
+                      <tr key={result.name} className="border-t border-slate-200">
+                        <td className="px-3 py-2 font-semibold text-slate-950">{result.name}</td>
+                        <td className="px-3 py-2 font-mono text-emerald-500">{result.best}</td>
+                        <td className="px-3 py-2 font-mono text-gold">{result.average}</td>
+                        <td className="px-3 py-2 font-mono text-red-400">{result.worst}</td>
+                        <td className="px-3 py-2 font-mono text-lavender">{result.space}</td>
+                        <td className="px-3 py-2 text-slate-700">{result.comparisons || '-'}</td>
+                        <td className="px-3 py-2 text-slate-700">{result.swaps || '-'}</td>
+                        <td className="px-3 py-2 text-slate-700">{result.timeMs ? `${result.timeMs.toFixed(2)}ms` : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="h-72 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                <p className="text-[10px] text-muted-foreground mb-2">Comparisons vs Swaps</p>
+                {raceResults.length ? (
+                  <ResponsiveContainer width="100%" height="92%">
+                    <BarChart data={raceResults}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: 12 }} />
+                      <Bar dataKey="comparisons" fill="#7c3aed" radius={[5, 5, 0, 0]} />
+                      <Bar dataKey="swaps" fill="#d4a574" radius={[5, 5, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
+                    Click Race to fill the comparison chart.
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

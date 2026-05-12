@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
-import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp, Zap, CheckCircle } from 'lucide-react'
+import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp, Zap, CheckCircle, BarChart3, BookOpen } from 'lucide-react'
 
 interface StackItem {
   id: number
@@ -71,16 +71,28 @@ export function Experiment2Page() {
   const [poppingItem, setPoppingItem] = useState<number | null>(null)
   const [thoughts, setThoughts] = useState<string[]>([])
   const [isThinking, setIsThinking] = useState(false)
+  const maxVisualCapacity = 8
+
+  const operationStats = useMemo(() => {
+    const pushes = history.filter(item => item.type === 'push').length
+    const pops = history.filter(item => item.type === 'pop').length
+    const peeks = history.filter(item => item.type === 'peek').length
+    return { pushes, pops, peeks, total: history.length }
+  }, [history])
 
   const pushOp = useCallback(() => {
-    const val = parseInt(inputValue)
-    if (isNaN(val)) return
+    const values = inputValue.split(',').map(value => parseInt(value.trim())).filter(value => !isNaN(value))
+    if (values.length === 0) return
 
-    const id = nextId
-    setStack(prev => [...prev, { id, value: val }])
-    setHistory(prev => [...prev, { id: Date.now(), type: 'push', value: val, timestamp: Date.now() }])
-    setThoughts(prev => [...prev, `Pushing ${val} onto the stack. New top: ${val}.`])
-    setNextId(prev => prev + 1)
+    const now = Date.now()
+    const newItems = values.map((value, index) => ({ id: nextId + index, value }))
+    setStack(prev => [...prev, ...newItems])
+    setHistory(prev => [
+      ...prev,
+      ...values.map((value, index) => ({ id: now + index, type: 'push' as const, value, timestamp: now + index })),
+    ])
+    setThoughts(prev => [...prev, `Pushed ${values.join(', ')} onto the stack. New top: ${values[values.length - 1]}.`])
+    setNextId(prev => prev + values.length)
     setInputValue('')
   }, [inputValue, nextId])
 
@@ -117,6 +129,25 @@ export function Experiment2Page() {
     setThoughts([])
     setInputValue('')
     setCode(getDefaultStackCode())
+  }, [])
+
+  const loadSampleStack = useCallback(() => {
+    const values = [12, 24, 36, 48]
+    setStack(values.map((value, index) => ({ id: index + 1, value })))
+    setNextId(values.length + 1)
+    setHistory(values.map((value, index) => ({
+      id: Date.now() + index,
+      type: 'push',
+      value,
+      timestamp: Date.now() + index,
+    })))
+    setThoughts(['Loaded a sample stack. The latest pushed value, 48, is now at the top.'])
+    setCode(getStackCode(values.map(value => `s.push(${value})`).join('\n')))
+  }, [])
+
+  const fillPattern = useCallback((values: number[]) => {
+    setInputValue(values.join(', '))
+    setThoughts([`Loaded quick input: ${values.join(', ')}. Press Push to add them as batch operations.`])
   }, [])
 
   const runStackCode = useCallback(async () => {
@@ -227,6 +258,20 @@ export function Experiment2Page() {
 
       {/* Main Content */}
       <section className="px-6 pb-8">
+        <div className="max-w-6xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+          {[
+            ['1', 'Enter values', 'Single number or comma-separated batch.'],
+            ['2', 'Push / Pop / Peek', 'Watch the top pointer move instantly.'],
+            ['3', 'Inspect code', 'Python operations sync from your actions.'],
+            ['4', 'Read theory', 'Connect the visual stack to LIFO behavior.'],
+          ].map(([step, title, desc]) => (
+            <div key={step} className="rounded-2xl glass p-4">
+              <div className="w-7 h-7 rounded-full bg-gold/10 text-gold flex items-center justify-center text-xs font-bold mb-3">{step}</div>
+              <p className="text-sm font-semibold text-slate-950">{title}</p>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: Stack Visualization */}
           <div className="space-y-6">
@@ -236,10 +281,19 @@ export function Experiment2Page() {
               transition={{ delay: 0.2 }}
               className="rounded-2xl glass p-6"
             >
-              <h3 className="text-sm font-semibold text-slate-950 mb-6 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-gold" />
-                Stack Visualization
-              </h3>
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-gold" />
+                    Watch it Live
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">The stack pointer always targets the most recently pushed value.</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground">Stack Pointer</p>
+                  <p className="text-sm font-mono font-bold text-gold">SP = 0x{Math.max(stack.length - 1, 0).toString(16).padStart(2, '0')}</p>
+                </div>
+              </div>
 
               {/* Stack Container */}
               <div className="relative mx-auto max-w-xs">
@@ -295,9 +349,14 @@ export function Experiment2Page() {
                             : 'bg-slate-50 border-slate-200'
                         }`}
                       >
+                        <span className="absolute left-2 text-[9px] font-mono text-muted-foreground">
+                          0x{index.toString(16).padStart(2, '0')}
+                        </span>
                         <span className="text-lg font-bold text-slate-950">{item.value}</span>
                         {index === stack.length - 1 && (
-                          <span className="absolute right-2 text-[9px] text-gold/40">TOP</span>
+                          <span className="absolute right-2 flex items-center gap-1 text-[9px] text-gold">
+                            <ArrowDown className="w-3 h-3" /> SP
+                          </span>
                         )}
                       </motion.div>
                     ))}
@@ -312,7 +371,27 @@ export function Experiment2Page() {
               <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                 <span>Size: <span className="text-slate-950 font-semibold">{stack.length}</span></span>
                 <span>•</span>
+                <span>Visual capacity: <span className="text-slate-950 font-semibold">{stack.length}/{maxVisualCapacity}</span></span>
+                <span>•</span>
                 <span>Complexity: <span className="text-gold font-semibold">O(1)</span></span>
+              </div>
+              <div className="mt-3 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <motion.div
+                  animate={{ width: `${Math.min((stack.length / maxVisualCapacity) * 100, 100)}%` }}
+                  className="h-full bg-gradient-to-r from-gold to-gold-muted"
+                />
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                {[
+                  ['Base', '0x00'],
+                  ['SP', stack.length ? `0x${(stack.length - 1).toString(16).padStart(2, '0')}` : 'empty'],
+                  ['Capacity', `${stack.length}/${maxVisualCapacity}`],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <p className="text-[9px] text-muted-foreground">{label}</p>
+                    <p className="text-xs font-mono font-semibold text-slate-950">{value}</p>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
@@ -323,24 +402,41 @@ export function Experiment2Page() {
               transition={{ delay: 0.3 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-slate-950 mb-4">Operations</h3>
+              <h3 className="text-sm font-semibold text-slate-950 mb-1">Interact with the Stack</h3>
+              <p className="text-xs text-muted-foreground mb-4">Enter a value, or several values separated by commas, and push them onto the stack.</p>
               <div className="flex gap-2 mb-4">
                 <input
-                  type="number"
+                  type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && pushOp()}
-                  placeholder="Value..."
-                  className="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-gold/30 transition-colors"
+                  placeholder="Value or batch: 10, 20, 30"
+                  className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-gold/30 transition-colors"
                 />
                 <motion.button
                   onClick={pushOp}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg bg-gold/10 text-gold text-sm font-medium hover:bg-gold/20 transition-colors flex items-center gap-1.5"
+                  className="px-5 py-3 rounded-xl bg-gold/10 text-gold text-sm font-semibold hover:bg-gold/20 transition-colors flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" /> Push
                 </motion.button>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {[
+                  ['Random', [17, 42, 8]],
+                  ['Fibonacci', [1, 1, 2, 3, 5]],
+                  ['Powers', [2, 4, 8, 16]],
+                ].map(([label, values]) => (
+                  <button
+                    key={label as string}
+                    type="button"
+                    onClick={() => fillPattern(values as number[])}
+                    className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-muted-foreground hover:text-slate-950"
+                  >
+                    {label as string}
+                  </button>
+                ))}
               </div>
               <div className="flex gap-2">
                 <motion.button
@@ -370,6 +466,13 @@ export function Experiment2Page() {
                   <RotateCcw className="w-3.5 h-3.5" />
                 </motion.button>
               </div>
+              <button
+                type="button"
+                onClick={loadSampleStack}
+                className="mt-3 w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-muted-foreground text-xs hover:text-slate-950 transition-colors"
+              >
+                Load Sample Stack
+              </button>
             </motion.div>
           </div>
 
@@ -425,6 +528,41 @@ export function Experiment2Page() {
               className="rounded-2xl glass p-5"
             >
               <h3 className="text-sm font-semibold text-slate-950 mb-4">Operation History</h3>
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {[
+                  ['Push', operationStats.pushes, 'text-gold'],
+                  ['Pop', operationStats.pops, 'text-red-400'],
+                  ['Peek', operationStats.peeks, 'text-lavender'],
+                  ['Total', operationStats.total, 'text-slate-950'],
+                ].map(([label, value, color]) => (
+                  <div key={label} className="rounded-lg bg-slate-50 border border-slate-200 p-2 text-center">
+                    <p className={`text-sm font-bold ${color}`}>{value}</p>
+                    <p className="text-[9px] text-muted-foreground">{label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mb-4">
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Operation Timeline</p>
+                <div className="flex gap-1 overflow-x-auto pb-1">
+                  {history.length === 0 ? (
+                    <div className="h-8 flex-1 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-[10px] text-muted-foreground flex items-center justify-center">
+                      Push, pop, or peek to build the timeline
+                    </div>
+                  ) : history.map((op, index) => (
+                    <div
+                      key={`${op.id}-${index}`}
+                      title={`${op.type.toUpperCase()} ${op.value ?? ''}`}
+                      className={`h-8 min-w-10 rounded-lg flex items-center justify-center text-[9px] font-bold ${
+                        op.type === 'push' ? 'bg-gold/15 text-gold' :
+                        op.type === 'pop' ? 'bg-red-500/10 text-red-400' :
+                        'bg-lavender/10 text-lavender'
+                      }`}
+                    >
+                      {op.type[0].toUpperCase()}{op.value}
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 <AnimatePresence>
                   {history.length === 0 && (
@@ -459,7 +597,39 @@ export function Experiment2Page() {
       </section>
 
       <section className="px-6 pb-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl glass p-5"
+          >
+            <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-gold" />
+              Class Anatomy
+            </h3>
+            <div className="rounded-lg bg-slate-950 text-slate-100 p-4 font-mono text-[11px] space-y-1">
+              <p className="text-gold">class Stack:</p>
+              <p className="pl-4 text-slate-300">- items: list</p>
+              <p className="pl-4 text-slate-300">+ push(item)</p>
+              <p className="pl-4 text-slate-300">+ pop()</p>
+              <p className="pl-4 text-slate-300">+ peek()</p>
+              <p className="pl-4 text-slate-300">+ is_empty()</p>
+            </div>
+            <div className="mt-4 space-y-2">
+              {[
+                ['Encapsulation', 'The list is owned by the Stack object.'],
+                ['State', 'Each operation changes or reads items.'],
+                ['LIFO Rule', 'Only the top element is removed first.'],
+              ].map(([title, desc]) => (
+                <div key={title} className="flex items-start gap-2">
+                  <BarChart3 className="w-3.5 h-3.5 text-gold mt-0.5" />
+                  <p className="text-[11px] text-muted-foreground"><span className="font-semibold text-slate-950">{title}:</span> {desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
