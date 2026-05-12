@@ -48,6 +48,15 @@ jobs:
         run: npx tsc --noEmit
       - name: Build with Next.js
         run: npm run build
+      - name: Prepare static export
+        run: |
+          if [ ! -f out/index.html ]; then
+            mkdir -p out/_next
+            cp -R .next/server/app/. out/
+            cp -R .next/static out/_next/static
+            cp -R public/. out/
+          fi
+          touch out/.nojekyll
       - name: Verify static export
         run: test -d out && test -f out/index.html
       - name: Upload artifact
