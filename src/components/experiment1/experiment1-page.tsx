@@ -6,7 +6,6 @@ import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { BarChart3, Play, Upload, Download, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw, CopyX, ArrowUpDown, PieChart as PieChartIcon, Activity as ActivityIcon } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
-import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 const sampleCSV = `Product,Brand,Price,Quantity,Category,Rating,Discount,InStock
 T-Shirt,Nike,899,18,Apparel,4.4,10,Yes
@@ -453,9 +452,9 @@ export function Experiment1Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-lavender/10 flex items-center justify-center text-lavender"
               >
-                <Soft3DIcon variant="data" size="md" />
+                <BarChart3 className="w-5 h-5" />
               </motion.div>
               <div>
                 <motion.h1
@@ -664,7 +663,7 @@ export function Experiment1Page() {
                   </div>
                 </div>
               </div>
-              <div className="max-h-64 overflow-auto rounded-lg border border-slate-200">
+              <div className="max-h-64 overflow-auto rounded-lg border-0 bg-white/55 sm:border sm:border-slate-200">
                 <table className="min-w-[720px] w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-200">
@@ -825,7 +824,7 @@ export function Experiment1Page() {
                   </motion.button>
                 </div>
               </div>
-              <div className="rounded-lg overflow-hidden border border-slate-200">
+              <div className="overflow-hidden rounded-lg border-0 bg-white/60 sm:border sm:border-slate-200">
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
@@ -874,7 +873,7 @@ export function Experiment1Page() {
             >
               <h3 className="text-sm font-semibold text-slate-950 mb-4">Filtered Dataset Visuals</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="h-44 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                <div className="h-44 rounded-xl border-0 bg-slate-50/85 p-2 sm:border sm:border-slate-200 sm:p-3">
                   <p className="text-[10px] text-muted-foreground mb-2">Category Split</p>
                   <ResponsiveContainer width="100%" height="88%">
                     <PieChart>
@@ -887,7 +886,7 @@ export function Experiment1Page() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="h-44 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                <div className="h-44 rounded-xl border-0 bg-slate-50/85 p-2 sm:border sm:border-slate-200 sm:p-3">
                   <p className="text-[10px] text-muted-foreground mb-2">Price Distribution</p>
                   <ResponsiveContainer width="100%" height="88%">
                     <BarChart data={histogramData}>
@@ -898,7 +897,7 @@ export function Experiment1Page() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="md:col-span-2 h-48 rounded-xl bg-slate-50 border border-slate-200 p-3">
+                <div className="md:col-span-2 h-48 rounded-xl border-0 bg-slate-50/85 p-2 sm:border sm:border-slate-200 sm:p-3">
                   <p className="text-[10px] text-muted-foreground mb-2">Price vs Quantity</p>
                   <ResponsiveContainer width="100%" height="88%">
                     <ScatterChart>
@@ -926,7 +925,7 @@ export function Experiment1Page() {
               </h3>
               <div
                 ref={outputRef}
-                className="max-h-48 overflow-y-auto rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs font-mono text-slate-600"
+                className="max-h-48 overflow-y-auto rounded-lg border-0 bg-slate-50/85 p-3 text-xs font-mono text-slate-600 sm:border sm:border-slate-200"
               >
                 {output || (
                   <span className="text-muted-foreground/50 italic">Run the code to see output...</span>
@@ -984,7 +983,7 @@ export function Experiment1Page() {
                   </button>
                 ))}
               </div>
-              <div className="h-64">
+              <div className="h-56 sm:h-64">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     {chartType === 'line' ? (

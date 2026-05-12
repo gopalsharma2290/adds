@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp, Zap, CheckCircle, BarChart3, BookOpen } from 'lucide-react'
-import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 interface StackItem {
   id: number
@@ -223,9 +222,9 @@ export function Experiment2Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold"
               >
-                <Soft3DIcon variant="stack" size="md" />
+                <Layers className="w-5 h-5" />
               </motion.div>
               <div>
                 <motion.h1
@@ -313,7 +312,7 @@ export function Experiment2Page() {
                 </AnimatePresence>
 
                 {/* Stack Items */}
-                <div className="min-h-[300px] flex flex-col-reverse gap-2 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="min-h-[260px] flex flex-col-reverse gap-2 rounded-xl border-0 bg-slate-50/85 p-3 sm:min-h-[300px] sm:border sm:border-slate-200 sm:p-4">
                   <AnimatePresence mode="popLayout">
                     {stack.length === 0 && (
                       <motion.div
@@ -506,16 +505,16 @@ export function Experiment2Page() {
                   {pyodideLoading ? 'Loading...' : isRunning ? 'Running...' : 'Run Code'}
                 </motion.button>
               </div>
-              <div className="rounded-lg overflow-hidden border border-slate-200">
+              <div className="overflow-hidden rounded-lg border-0 bg-white/60 sm:border sm:border-slate-200">
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full h-64 p-4 bg-white text-slate-800 text-xs font-mono resize-none focus:outline-none"
+                  className="h-56 w-full bg-white px-3 py-3 text-xs font-mono text-slate-800 resize-none focus:outline-none sm:h-64 sm:p-4"
                   spellCheck={false}
                 />
               </div>
               {output && (
-                <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-h-32 overflow-y-auto">
+                <div className="mt-3 max-h-32 overflow-y-auto rounded-lg border-0 bg-slate-50/85 p-3 text-xs font-mono text-slate-600 sm:border sm:border-slate-200">
                   {output}
                 </div>
               )}

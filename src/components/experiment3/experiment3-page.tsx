@@ -6,7 +6,6 @@ import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { ArrowUpDown, Play, Pause, RotateCcw, SkipForward, Loader2, Zap, GitCompare, ArrowLeftRight, Trophy } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 interface SortBar {
   id: number
@@ -456,9 +455,9 @@ export function Experiment3Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400"
               >
-                <Soft3DIcon variant="sort" size="md" />
+                <ArrowUpDown className="w-5 h-5" />
               </motion.div>
               <div>
                 <motion.h1
@@ -603,7 +602,7 @@ export function Experiment3Page() {
               <h3 className="text-sm font-semibold text-slate-950">Sorting Visualization</h3>
             </div>
 
-            <div className="flex h-56 items-end justify-center gap-1 overflow-x-auto px-1 sm:h-64 sm:gap-2 sm:px-4">
+            <div className="mx-[-4px] flex h-52 items-end justify-center gap-1 overflow-x-auto rounded-xl border-0 bg-slate-50/65 px-2 py-3 sm:mx-0 sm:h-64 sm:gap-2 sm:border sm:border-slate-200 sm:bg-transparent sm:px-4 sm:py-0">
               <AnimatePresence>
                 {array.map((bar, index) => (
                   <motion.div
@@ -764,7 +763,7 @@ export function Experiment3Page() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <div className="overflow-x-auto rounded-xl border-0 bg-white/60 sm:border sm:border-slate-200">
                 <table className="w-full text-xs">
                   <thead className="bg-slate-50 text-muted-foreground">
                     <tr>
@@ -794,7 +793,7 @@ export function Experiment3Page() {
                   </tbody>
                 </table>
               </div>
-              <div className="h-72 rounded-xl bg-slate-50 border border-slate-200 p-3">
+              <div className="h-64 rounded-xl border-0 bg-slate-50/85 p-2 sm:h-72 sm:border sm:border-slate-200 sm:p-3">
                 <p className="text-[10px] text-muted-foreground mb-2">Comparisons vs Swaps</p>
                 {raceResults.length ? (
                   <ResponsiveContainer width="100%" height="92%">
@@ -846,11 +845,11 @@ export function Experiment3Page() {
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-64 p-4 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs font-mono resize-none focus:outline-none"
+              className="h-56 w-full rounded-lg border-0 bg-white px-3 py-3 text-xs font-mono text-slate-800 resize-none focus:outline-none sm:h-64 sm:border sm:border-slate-200 sm:p-4"
               spellCheck={false}
             />
             {output && (
-              <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-h-32 overflow-y-auto">
+              <div className="mt-3 max-h-32 overflow-y-auto rounded-lg border-0 bg-slate-50/85 p-3 text-xs font-mono text-slate-600 sm:border sm:border-slate-200">
                 {output}
               </div>
             )}

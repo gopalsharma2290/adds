@@ -2,13 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore, type PageId } from '@/stores/app-store'
-import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
+import { Home, BarChart3, Layers, ArrowUpDown, FlaskConical, Menu, X } from 'lucide-react'
 
-const navItems: { id: PageId; label: string; icon: 'home' | 'data' | 'stack' | 'sort'; section?: string }[] = [
-  { id: 'home', label: 'Home', icon: 'home' },
-  { id: 'experiment-1', label: 'Data Analysis', icon: 'data', section: 'Experiments' },
-  { id: 'experiment-2', label: 'Stack', icon: 'stack', section: 'Experiments' },
-  { id: 'experiment-3', label: 'Bubble Sort', icon: 'sort', section: 'Experiments' },
+const navItems: { id: PageId; label: string; icon: React.ReactNode; section?: string }[] = [
+  { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
+  { id: 'experiment-1', label: 'Data Analysis', icon: <BarChart3 className="w-4 h-4" />, section: 'Experiments' },
+  { id: 'experiment-2', label: 'Stack', icon: <Layers className="w-4 h-4" />, section: 'Experiments' },
+  { id: 'experiment-3', label: 'Bubble Sort', icon: <ArrowUpDown className="w-4 h-4" />, section: 'Experiments' },
 ]
 
 export function Sidebar() {
@@ -30,11 +30,7 @@ export function Sidebar() {
         className="fixed left-4 top-4 z-[70] flex h-12 w-12 items-center justify-center rounded-full border border-slate-200/80 bg-white/85 text-slate-950 shadow-[0_14px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl transition-colors hover:bg-white"
         aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
       >
-        <span className="relative flex h-5 w-5 flex-col items-center justify-center gap-1.5" aria-hidden="true">
-          <span className={`h-0.5 w-5 rounded-full bg-current transition-transform ${menuOpen ? 'translate-y-2 rotate-45' : ''}`} />
-          <span className={`h-0.5 w-5 rounded-full bg-current transition-opacity ${menuOpen ? 'opacity-0' : 'opacity-100'}`} />
-          <span className={`h-0.5 w-5 rounded-full bg-current transition-transform ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
-        </span>
+        {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </motion.button>
 
       <AnimatePresence>
@@ -57,7 +53,9 @@ export function Sidebar() {
               className="fixed left-4 top-20 z-[65] flex w-[min(320px,calc(100vw-32px))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/92 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur-2xl"
             >
               <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-4">
-                <Soft3DIcon variant="data" size="sm" />
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-lavender to-lavender-glow">
+                  <FlaskConical className="h-4 w-4 text-white" />
+                </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-950">ADDS Lab</p>
                   <p className="text-xs text-muted-foreground">Interactive experiments</p>
@@ -85,7 +83,9 @@ export function Sidebar() {
                         }
                       `}
                     >
-                      <Soft3DIcon variant={item.icon} size="sm" className="scale-90" />
+                      <span className={`flex-shrink-0 transition-colors duration-200 ${currentPage === item.id ? 'text-lavender' : ''}`}>
+                        {item.icon}
+                      </span>
                       <span className="font-medium">{item.label}</span>
                       {currentPage === item.id && (
                         <motion.div

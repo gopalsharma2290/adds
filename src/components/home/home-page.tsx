@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useAppStore, type PageId } from '@/stores/app-store'
-import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
+import { BarChart3, Layers, ArrowUpDown, ChevronRight, Code2, Cpu, Database, Zap } from 'lucide-react'
 import { useRef } from 'react'
 
 const experiments = [
@@ -10,7 +10,7 @@ const experiments = [
     id: 'experiment-1' as PageId,
     title: 'Data Analysis & Visualization',
     description: 'Transform raw CSV data into meaningful insights using pandas, filtering, grouping, and animated chart visualization.',
-    icon: 'data' as const,
+    icon: <BarChart3 className="w-6 h-6" />,
     gradient: 'from-lavender/20 to-blue-500/20',
     accent: 'text-lavender',
     border: 'border-lavender/20',
@@ -20,7 +20,7 @@ const experiments = [
     id: 'experiment-2' as PageId,
     title: 'Stack Data Structure',
     description: 'Visualize LIFO operations with animated push/pop, real-time stack memory simulation, and complexity analysis.',
-    icon: 'stack' as const,
+    icon: <Layers className="w-6 h-6" />,
     gradient: 'from-gold/20 to-orange-500/20',
     accent: 'text-gold',
     border: 'border-gold/20',
@@ -30,7 +30,7 @@ const experiments = [
     id: 'experiment-3' as PageId,
     title: 'Bubble Sort Visualization',
     description: 'Watch bubble sort come alive with animated comparisons, fluid swaps, and real-time algorithm analysis.',
-    icon: 'sort' as const,
+    icon: <ArrowUpDown className="w-6 h-6" />,
     gradient: 'from-emerald-500/20 to-teal-500/20',
     accent: 'text-emerald-400',
     border: 'border-emerald-500/20',
@@ -39,12 +39,12 @@ const experiments = [
 ]
 
 const techStack = [
-  { name: 'Next.js 16', icon: 'code' as const, desc: 'App Router & React 19' },
-  { name: 'Pyodide', icon: 'python' as const, desc: 'Browser Python Runtime' },
-  { name: 'Recharts', icon: 'chart' as const, desc: 'Data Visualization' },
-  { name: 'Framer Motion', icon: 'motion' as const, desc: 'Fluid Animations' },
-  { name: 'Monaco Editor', icon: 'code' as const, desc: 'Code Editor' },
-  { name: 'TypeScript', icon: 'type' as const, desc: 'Type Safety' },
+  { name: 'Next.js 16', icon: <Code2 className="w-5 h-5" />, desc: 'App Router & React 19' },
+  { name: 'Pyodide', icon: <Cpu className="w-5 h-5" />, desc: 'Browser Python Runtime' },
+  { name: 'Recharts', icon: <BarChart3 className="w-5 h-5" />, desc: 'Data Visualization' },
+  { name: 'Framer Motion', icon: <Zap className="w-5 h-5" />, desc: 'Fluid Animations' },
+  { name: 'Monaco Editor', icon: <Code2 className="w-5 h-5" />, desc: 'Code Editor' },
+  { name: 'TypeScript', icon: <Database className="w-5 h-5" />, desc: 'Type Safety' },
 ]
 
 const stagger = {
@@ -79,26 +79,38 @@ export function HomePage() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(135deg, #f6efe7 0%, #efd8cd 28%, #dce6dc 58%, #d9e3ef 100%)',
+              'linear-gradient(138deg, #f7efe5 0%, #edd7cb 24%, #d8e4dc 56%, #d4dfee 100%)',
           }}
         />
         <div
-          className="absolute inset-0 opacity-90"
+          className="absolute inset-0 opacity-95"
           style={{
             background:
-              'linear-gradient(110deg, rgba(255,248,234,0.92) 0 19%, transparent 19% 44%, rgba(228,214,202,0.72) 44% 68%, transparent 68% 100%)',
+              'linear-gradient(112deg, rgba(255,250,242,0.92) 0 18%, transparent 18% 42%, rgba(227,214,201,0.75) 42% 68%, transparent 68% 100%)',
           }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.45),transparent_24%),radial-gradient(circle_at_83%_72%,rgba(185,203,221,0.38),transparent_26%),radial-gradient(circle_at_52%_48%,rgba(234,219,207,0.42),transparent_34%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.48),transparent_24%),radial-gradient(circle_at_83%_72%,rgba(185,203,221,0.42),transparent_26%),radial-gradient(circle_at_52%_48%,rgba(234,219,207,0.46),transparent_34%)]" />
+        <div
+          className="absolute inset-0 opacity-50 mix-blend-soft-light"
+          style={{
+            backgroundImage:
+              'radial-gradient(rgba(255,255,255,0.6) 0.7px, transparent 0.7px), radial-gradient(rgba(125,148,170,0.18) 0.7px, transparent 0.7px)',
+            backgroundSize: '18px 18px, 26px 26px',
+            backgroundPosition: '0 0, 9px 11px',
+          }}
+        />
+        <div className="absolute left-[10%] top-[16%] h-48 w-48 rounded-full bg-white/35 blur-3xl sm:h-64 sm:w-64" />
+        <div className="absolute right-[12%] top-[28%] h-56 w-56 rounded-full bg-[#d7e3ec]/60 blur-3xl sm:h-72 sm:w-72" />
+        <div className="absolute left-[18%] bottom-[20%] h-44 w-44 rounded-full bg-[#efdccf]/55 blur-3xl sm:h-56 sm:w-56" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f7f3ee] via-[#f7f3ee]/65 to-transparent" />
 
         {/* Content */}
-        <div className="relative z-10 flex min-h-[680px] flex-col justify-end px-4 pb-8 pt-24 sm:min-h-screen sm:px-6 md:px-8">
+        <div className="relative z-10 flex min-h-[680px] flex-col justify-end px-6 pb-10 pt-24 sm:min-h-screen sm:px-8 md:px-10 lg:px-14">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-            className="pointer-events-none absolute left-4 right-4 top-24 text-[5.8rem] font-black leading-none text-slate-950/10 sm:top-20 sm:text-[8.5rem] md:left-6 md:right-6 md:top-16 md:text-[12rem] lg:text-[16rem] xl:text-[19rem]"
+            className="pointer-events-none absolute left-6 right-6 top-24 text-[5.8rem] font-black leading-none text-slate-950/[0.08] sm:top-20 sm:text-[8.5rem] md:left-8 md:right-8 md:top-16 md:text-[12rem] lg:left-14 lg:right-14 lg:text-[16rem] xl:text-[19rem]"
           >
             ADDS
           </motion.h1>
@@ -107,13 +119,13 @@ export function HomePage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.7 }}
-            className="relative z-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+            className="relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8"
           >
-            <div className="min-w-0">
-              <p className="max-w-[760px] text-5xl font-black leading-[0.95] text-slate-950 sm:text-6xl md:text-7xl lg:text-8xl">
+            <div className="min-w-0 rounded-[32px] border border-white/35 bg-white/18 p-4 shadow-[0_18px_60px_rgba(94,84,70,0.08)] backdrop-blur-[22px] sm:max-w-[820px] sm:p-6">
+              <p className="max-w-[760px] text-5xl font-black leading-[0.92] text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl">
                 visualize<br />the workflow
               </p>
-              <p className="mt-5 max-w-xl text-sm font-medium leading-6 text-slate-700 sm:text-base">
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-800/80 sm:text-base">
                 Interactive data, stack, and sorting experiments built for clear hands-on learning.
               </p>
             </div>
@@ -168,13 +180,15 @@ export function HomePage() {
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${exp.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 
                 <div className="relative z-10">
-                  <Soft3DIcon variant={exp.icon} size="md" className="mb-4" />
+                  <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${exp.gradient} ${exp.accent}`}>
+                    {exp.icon}
+                  </div>
                   <h3 className="text-lg font-semibold text-slate-950 mb-2">{exp.title}</h3>
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{exp.description}</p>
                   <div className="flex items-center gap-2 text-sm font-medium text-lavender/70 group-hover:text-lavender transition-colors">
                     <span>Launch Experiment</span>
-                    <motion.span className="inline-block text-base" initial={{ x: 0 }} whileHover={{ x: 4 }}>
-                      →
+                    <motion.span className="inline-block" initial={{ x: 0 }} whileHover={{ x: 4 }}>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </motion.span>
                   </div>
                 </div>
@@ -219,8 +233,8 @@ export function HomePage() {
                 whileHover={{ y: -4 }}
                 className="group p-4 rounded-xl glass text-center hover:border-slate-200 transition-all duration-300"
               >
-                <div className="mb-4 flex justify-center">
-                  <Soft3DIcon variant={tech.icon} size="sm" />
+                <div className="text-lavender/60 group-hover:text-lavender transition-colors mb-3 flex justify-center">
+                  {tech.icon}
                 </div>
                 <p className="text-sm font-medium text-slate-950">{tech.name}</p>
                 <p className="text-[11px] text-muted-foreground mt-1">{tech.desc}</p>
