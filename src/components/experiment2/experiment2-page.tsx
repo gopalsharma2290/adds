@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
-import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp } from 'lucide-react'
+import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp, Zap, CheckCircle } from 'lucide-react'
 
 interface StackItem {
   id: number
@@ -455,6 +455,71 @@ export function Experiment2Page() {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      <section className="px-6 pb-16">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl glass p-5"
+          >
+            <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-gold" />
+              Operation Complexity
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { op: 'Push', complexity: 'O(1)', desc: 'Append to the top' },
+                { op: 'Pop', complexity: 'O(1)', desc: 'Remove from the top' },
+                { op: 'Peek', complexity: 'O(1)', desc: 'Read the top element' },
+                { op: 'isEmpty', complexity: 'O(1)', desc: 'Check stack length' },
+              ].map((item) => (
+                <div key={item.op} className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-mono text-muted-foreground">{item.op}</span>
+                    <span className="text-xs font-mono font-bold text-gold">{item.complexity}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl glass p-5"
+          >
+            <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-lavender" />
+              Why Stacks Matter
+            </h3>
+            <div className="space-y-3">
+              {[
+                {
+                  title: 'Undo Operations',
+                  desc: 'Editors push every action onto a stack. Undo pops the most recent action first.',
+                },
+                {
+                  title: 'Browser History',
+                  desc: 'Back navigation follows the latest page first, matching the LIFO pattern.',
+                },
+                {
+                  title: 'Function Calls',
+                  desc: 'The call stack tracks active functions and pops each one when it returns.',
+                },
+              ].map((item) => (
+                <div key={item.title} className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-950 mb-1">{item.title}</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

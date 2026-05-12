@@ -1,60 +1,30 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { ChangeEvent, useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
-import { BarChart3, Play, Upload, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw } from 'lucide-react'
+import { BarChart3, Play, Upload, Download, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
-const sampleCSV = `Product,Brand,Price,Quantity
-T-Shirt,Nike,1200,5
-Jeans,Levis,2500,3
-Jacket,Puma,3500,2
-Socks,Nike,300,10
-Shirt,Levis,1800,4
-Hoodie,Puma,2200,6
-Cap,Nike,800,8
-Trousers,Levis,1500,3
-Sneakers,Nike,4500,2
-Shorts,Puma,900,7
-Dress,Levis,3200,1
-Scarf,Nike,600,5
-Gloves,Puma,400,4
-Vest,Levis,1200,3
-Belt,Nike,700,6
-Watch,Puma,5500,1
-Boots,Levis,3800,2
-Hat,Nike,500,9
-Pants,Puma,1600,4
-Tie,Levis,900,3`
+const sampleCSV = `Product,Brand,Price,Quantity,Category
+T-Shirt,Nike,899,5,Apparel
+Sneakers,Adidas,2499,3,Footwear
+Jacket,Puma,1799,2,Apparel
+Shorts,Nike,599,8,Apparel
+Running Shoes,Nike,3299,1,Footwear
+Hoodie,Adidas,1299,4,Apparel
+Track Pants,Puma,999,6,Apparel
+Sports Bra,Nike,799,7,Apparel
+Cap,Adidas,499,10,Accessories
+Socks,Puma,299,15,Accessories`
 
-function getDefaultCode(): string {
+function getDefaultCode(csvText = sampleCSV): string {
   return `import pandas as pd
 from io import StringIO
 
 # Load the CSV data
-csv_text = """Product,Brand,Price,Quantity
-T-Shirt,Nike,1200,5
-Jeans,Levis,2500,3
-Jacket,Puma,3500,2
-Socks,Nike,300,10
-Shirt,Levis,1800,4
-Hoodie,Puma,2200,6
-Cap,Nike,800,8
-Trousers,Levis,1500,3
-Sneakers,Nike,4500,2
-Shorts,Puma,900,7
-Dress,Levis,3200,1
-Scarf,Nike,600,5
-Gloves,Puma,400,4
-Vest,Levis,1200,3
-Belt,Nike,700,6
-Watch,Puma,5500,1
-Boots,Levis,3800,2
-Hat,Nike,500,9
-Pants,Puma,1600,4
-Tie,Levis,900,3"""
+csv_text = ${JSON.stringify(csvText)}
 
 data = StringIO(csv_text)
 df = pd.read_csv(data)
@@ -69,11 +39,22 @@ filtered = df[df['Price'] > 1000]
 print("\\n=== Filtered (Price > 1000) ===")
 print(filtered.to_string())
 
-# Group by Brand and aggregate Quantity
-grouped = filtered.groupby('Brand')['Quantity'].sum().reset_index()
-grouped.columns = ['Brand', 'TotalQuantity']
+# Group by Brand and aggregate Quantity + Revenue
+df['Revenue'] = df['Price'] * df['Quantity']
+grouped = df.groupby('Brand').agg(
+    TotalQuantity=('Quantity', 'sum'),
+    TotalRevenue=('Revenue', 'sum')
+).reset_index().sort_values('TotalRevenue', ascending=False)
 print("\\n=== Grouped by Brand ===")
 print(grouped.to_string())
+
+if 'Category' in df.columns:
+    category_stats = df.groupby('Category').agg(
+        TotalQuantity=('Quantity', 'sum'),
+        TotalRevenue=('Revenue', 'sum')
+    ).reset_index()
+    print("\\n=== Category Performance ===")
+    print(category_stats.to_string())
 
 print("\\n__CHART_DATA__")
 import json
@@ -98,34 +79,41 @@ const explanationSteps = [
   { step: 5, title: 'Visualized', desc: 'The aggregated results are rendered as a bar chart, transforming numerical data into visual patterns.' },
 ]
 
-// Pre-compute table data from sample CSV
-const sampleTableData = (() => {
-  const lines = sampleCSV.trim().split('\n')
-  if (lines.length < 2) return []
-  const headers = lines[0].split(',')
-  return lines.slice(1).map(line => {
+type CsvCell = string | number
+type CsvRow = Record<string, CsvCell>
+
+function parseCsvRows(csvText: string): { headers: string[]; rows: CsvRow[] } {
+  const lines = csvText.trim().split(/\r?\n/).filter(Boolean)
+  if (lines.length < 2) return { headers: [], rows: [] }
+  const headers = lines[0].split(',').map(header => header.trim())
+  const rows = lines.slice(1).map(line => {
     const values = line.split(',')
-    const row: Record<string, string | number> = {}
+    const row: CsvRow = {}
     headers.forEach((h, i) => {
       const val = values[i]?.trim() || ''
       const num = Number(val)
-      row[h.trim()] = isNaN(num) ? val : num
+      row[h] = isNaN(num) ? val : num
     })
     return row
   })
-})()
+  return { headers, rows }
+}
 
 import { UsageThoughts } from '@/components/ui/usage-thoughts'
 
 export function Experiment1Page() {
   const { setCurrentPage } = useAppStore()
   const { pyodide, loading: pyodideLoading, runCode, output, isRunning } = usePyodide()
-  const [code, setCode] = useState(getDefaultCode)
+  const [csvContent, setCsvContent] = useState(sampleCSV)
+  const [code, setCode] = useState(() => getDefaultCode(sampleCSV))
   const [activePipelineStep, setActivePipelineStep] = useState(0)
-  const [chartData, setChartData] = useState<Array<{ Brand: string; TotalQuantity: number }>>([])
+  const [chartData, setChartData] = useState<Array<{ Brand: string; TotalQuantity: number; TotalRevenue: number }>>([])
   const [thoughts, setThoughts] = useState<string[]>([])
   const [isThinking, setIsThinking] = useState(false)
+  const [chartMetric, setChartMetric] = useState<'TotalRevenue' | 'TotalQuantity'>('TotalRevenue')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const outputRef = useRef<HTMLDivElement>(null)
+  const { headers, rows: tableRows } = parseCsvRows(csvContent)
 
   const handleRun = useCallback(async () => {
     if (!pyodide || isRunning) return
@@ -156,6 +144,7 @@ export function Experiment1Page() {
             setChartData(parsed.map((item: Record<string, unknown>) => ({
               Brand: String(item.Brand || item.brand || ''),
               TotalQuantity: Number(item.TotalQuantity || item.TotalQty || item.totalquantity || 0),
+              TotalRevenue: Number(item.TotalRevenue || item.Revenue || item.totalrevenue || 0),
             })))
           }
         }
@@ -167,6 +156,39 @@ export function Experiment1Page() {
     await Promise.all([runPipeline(), runExecution()])
     setIsThinking(false)
   }, [pyodide, code, isRunning, runCode])
+
+  const handleFileUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const nextCsv = String(reader.result || '')
+      setCsvContent(nextCsv)
+      setCode(getDefaultCode(nextCsv))
+      setChartData([])
+      setThoughts([`Loaded ${file.name}. Preview and code updated from the uploaded CSV.`])
+    }
+    reader.readAsText(file)
+    event.target.value = ''
+  }, [])
+
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = 'garment_sales.csv'
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }, [csvContent])
+
+  const resetDataset = useCallback(() => {
+    setCsvContent(sampleCSV)
+    setCode(getDefaultCode(sampleCSV))
+    setChartData([])
+    setThoughts(['Restored the sample garment dataset and default analysis code.'])
+  }, [])
 
   const chartColors = ['#a78bfa', '#7c3aed', '#d4a574', '#60a5fa', '#34d399']
 
@@ -330,19 +352,52 @@ export function Experiment1Page() {
                   <Database className="w-4 h-4 text-lavender" />
                   Dataset Preview
                 </h3>
-                <span className="text-[10px] text-muted-foreground">{sampleTableData.length} rows</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground">{tableRows.length} rows</span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-muted-foreground hover:text-lavender transition-colors"
+                    title="Upload CSV"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-muted-foreground hover:text-slate-950 transition-colors"
+                    title="Download CSV"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetDataset}
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-muted-foreground hover:text-slate-950 transition-colors"
+                    title="Reset Dataset"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
               <div className="max-h-64 overflow-y-auto rounded-lg border border-slate-200">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-200">
-                      {['Product', 'Brand', 'Price', 'Quantity'].map(h => (
+                      {headers.map(h => (
                         <th key={h} className="px-3 py-2 text-left text-muted-foreground font-medium">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {sampleTableData.map((row, i) => (
+                    {tableRows.slice(0, 10).map((row, i) => (
                       <motion.tr
                         key={i}
                         initial={{ opacity: 0 }}
@@ -350,18 +405,28 @@ export function Experiment1Page() {
                         transition={{ delay: i * 0.03 }}
                         className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
                       >
-                        <td className="px-3 py-1.5 text-slate-700">{row.Product}</td>
-                        <td className="px-3 py-1.5">
-                          <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] bg-lavender/10 text-lavender">
-                            {row.Brand}
-                          </span>
-                        </td>
-                        <td className="px-3 py-1.5 text-slate-700">₹{row.Price}</td>
-                        <td className="px-3 py-1.5 text-slate-700">{row.Quantity}</td>
+                        {headers.map(header => (
+                          <td key={header} className="px-3 py-1.5 text-slate-700">
+                            {header.toLowerCase() === 'brand' ? (
+                              <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] bg-lavender/10 text-lavender">
+                                {row[header]}
+                              </span>
+                            ) : header.toLowerCase() === 'price' ? (
+                              <>₹{row[header]}</>
+                            ) : (
+                              row[header]
+                            )}
+                          </td>
+                        ))}
                       </motion.tr>
                     ))}
                   </tbody>
                 </table>
+                {tableRows.length > 10 && (
+                  <div className="px-3 py-2 text-center text-[10px] text-muted-foreground">
+                    +{tableRows.length - 10} more rows
+                  </div>
+                )}
               </div>
             </motion.div>
 
@@ -381,7 +446,7 @@ export function Experiment1Page() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setCode(getDefaultCode())}
+                    onClick={() => setCode(getDefaultCode(csvContent))}
                     className="p-1.5 rounded-lg hover:bg-slate-100 text-muted-foreground hover:text-slate-950 transition-colors"
                     title="Reset Code"
                   >
@@ -449,26 +514,55 @@ export function Experiment1Page() {
               transition={{ delay: 0.5 }}
               className="rounded-2xl glass p-5"
             >
-              <h3 className="text-sm font-semibold text-slate-950 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-lavender" />
-                Visualization
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-lavender" />
+                  Visualization
+                </h3>
+                <div className="flex rounded-lg bg-slate-50 border border-slate-200 p-0.5">
+                  {([
+                    ['TotalRevenue', 'Revenue'],
+                    ['TotalQuantity', 'Quantity'],
+                  ] as const).map(([metric, label]) => (
+                    <button
+                      key={metric}
+                      type="button"
+                      onClick={() => setChartMetric(metric)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-colors ${
+                        chartMetric === metric ? 'bg-white text-lavender shadow-sm' : 'text-muted-foreground hover:text-slate-950'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="h-64">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} barSize={40}>
                       <XAxis dataKey="Brand" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
+                      <YAxis
+                        stroke="#9ca3af"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => chartMetric === 'TotalRevenue' ? `₹${Number(value) / 1000}K` : String(value)}
+                      />
                       <Tooltip
                         contentStyle={{
                           background: '#ffffff',
-                          border: '1px solid rgba(255,255,255,0.06)',
+                          border: '1px solid #e2e8f0',
                           borderRadius: '8px',
-                          color: '#faf5eb',
+                          color: '#0f172a',
                           fontSize: 12,
                         }}
+                        formatter={(value: number) => [
+                          chartMetric === 'TotalRevenue' ? `₹${value.toLocaleString()}` : value.toLocaleString(),
+                          chartMetric === 'TotalRevenue' ? 'Revenue' : 'Quantity',
+                        ]}
                       />
-                      <Bar dataKey="TotalQuantity" radius={[6, 6, 0, 0]}>
+                      <Bar dataKey={chartMetric} radius={[6, 6, 0, 0]}>
                         {chartData.map((_, index) => (
                           <Cell key={index} fill={chartColors[index % chartColors.length]} />
                         ))}

@@ -23,31 +23,45 @@ const speedMap: Record<SpeedMode, number> = {
 const defaultArray = [64, 34, 25, 12, 22, 11, 90, 45, 78, 33]
 
 const bubbleSortCode = `def bubble_sort(arr):
+    """Bubble Sort with step tracking"""
     n = len(arr)
+    comparisons = 0
+    swaps = 0
+
+    print(f"Original array: {arr}")
+
     for i in range(n):
         swapped = False
+        print(f"\\nPass {i + 1}:")
+
         for j in range(0, n - i - 1):
-            # Compare adjacent elements
+            comparisons += 1
+            print(f"  Compare: {arr[j]} vs {arr[j + 1]}", end="")
+
             if arr[j] > arr[j + 1]:
-                # Swap if needed
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swaps += 1
                 swapped = True
-        # If no swaps, array is sorted
+                print(f" -> Swap! Now: {arr}")
+            else:
+                print(" -> No swap")
+
         if not swapped:
+            print("  No swaps in this pass. Array is sorted!")
             break
+
+    print("\\n=== Results ===")
+    print(f"Sorted array: {arr}")
+    print(f"Total comparisons: {comparisons}")
+    print(f"Total swaps: {swaps}")
     return arr
 
 # Test
 arr = [64, 34, 25, 12, 22, 11, 90, 45, 78, 33]
-print(f"Original: {arr}")
 sorted_arr = bubble_sort(arr.copy())
-print(f"Sorted:   {sorted_arr}")
-print(f"\\nTime Complexity:")
-print(f"  Worst Case:  O(n²)")
-print(f"  Best Case:   O(n) — already sorted")
-print(f"  Average:     O(n²)")
-print(f"\\nSpace Complexity: O(1) — in-place sorting")
-print(f"\\nNote: Python's built-in sort() uses Timsort (O(n log n))")
+
+print(f"\\nPython sorted(): {sorted(arr)}")
+print("Timsort uses O(n log n) time, which is much faster than Bubble Sort's O(n²) on large lists.")
 `
 
 import { UsageThoughts } from '@/components/ui/usage-thoughts'
@@ -67,6 +81,7 @@ export function Experiment3Page() {
   const [isThinking, setIsThinking] = useState(false)
   const [sorted, setSorted] = useState(false)
   const [code, setCode] = useState(bubbleSortCode)
+  const [currentExplanation, setCurrentExplanation] = useState('Click Sort to begin visualization.')
   const abortRef = useRef(false)
   const pausedRef = useRef(false)
 
@@ -84,6 +99,7 @@ export function Experiment3Page() {
     setPasses(0)
     setThoughts([])
     setSorted(false)
+    setCurrentExplanation('Click Sort to begin visualization.')
     const nums = inputText.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n))
     if (nums.length > 0) {
       setArray(nums.map((v, i) => ({ id: i, value: v, state: 'default' })))
@@ -107,6 +123,7 @@ export function Experiment3Page() {
     setSwaps(0)
     setPasses(0)
     setThoughts(["Initializing Bubble Sort algorithm.", "Target: Bubble the largest elements to the end."])
+    setCurrentExplanation('Starting Bubble Sort. Each pass pushes the largest remaining value to the right.')
 
     const currentArray = [...array]
     const n = currentArray.length
@@ -116,10 +133,12 @@ export function Experiment3Page() {
       let swapped = false
       setPasses(p => p + 1)
       setThoughts(prev => [...prev.slice(-4), `Pass ${i + 1}: Starting scan of unsorted portion.`])
+      setCurrentExplanation(`Pass ${i + 1}: scanning positions 0 through ${n - i - 1}.`)
 
       for (let j = 0; j < n - i - 1; j++) {
         if (abortRef.current) break
 
+        setCurrentExplanation(`Comparing ${currentArray[j].value} and ${currentArray[j + 1].value}.`)
         // Highlight comparing pair
         setArray(prev => prev.map((bar, idx) => ({
           ...bar,
@@ -129,6 +148,7 @@ export function Experiment3Page() {
         
         if (currentArray[j].value > currentArray[j + 1].value) {
           setThoughts(prev => [...prev.slice(-4), `Found ${currentArray[j].value} > ${currentArray[j + 1].value}. Swapping positions.`])
+          setCurrentExplanation(`${currentArray[j].value} is greater than ${currentArray[j + 1].value}, so they swap.`)
           // Swap
           setArray(prev => prev.map((bar, idx) => ({
             ...bar,
@@ -152,6 +172,7 @@ export function Experiment3Page() {
           })
           await wait(speedMap[speed] / 2)
         } else {
+          setCurrentExplanation(`${currentArray[j].value} is already <= ${currentArray[j + 1].value}. No swap needed.`)
           await wait(speedMap[speed])
         }
 
@@ -173,6 +194,7 @@ export function Experiment3Page() {
       // Early termination
       if (!swapped) {
         setThoughts(prev => [...prev, "No swaps in this pass. Array is now fully sorted!"])
+        setCurrentExplanation('No swaps happened in this pass, so the array is fully sorted.')
         break
       }
     }
@@ -181,6 +203,7 @@ export function Experiment3Page() {
     setArray(prev => prev.map(bar => ({ ...bar, state: 'sorted' })))
     setSorted(true)
     setSorting(false)
+    setCurrentExplanation('Sorting complete. Every bar is in nondecreasing order.')
     setThoughts(prev => [...prev, "Execution complete. Array sorted successfully."])
   }, [array, speed, wait])
 
@@ -416,6 +439,15 @@ export function Experiment3Page() {
                 <span>Sorted</span>
               </div>
             </div>
+
+            <motion.p
+              key={currentExplanation}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 text-center text-sm text-slate-700"
+            >
+              {currentExplanation}
+            </motion.p>
           </motion.div>
 
           {/* Stats Panel */}
