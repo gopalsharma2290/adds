@@ -204,7 +204,7 @@ export function Experiment2Page() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -251,14 +251,14 @@ export function Experiment2Page() {
 
       {/* Usage Thoughts Panel */}
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Main Content */}
       <section className="px-6 pb-8">
-        <div className="max-w-6xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="mx-auto mb-6 grid max-w-[1480px] grid-cols-1 gap-3 md:grid-cols-4">
           {[
             ['1', 'Enter values', 'Single number or comma-separated batch.'],
             ['2', 'Push / Pop / Peek', 'Watch the top pointer move instantly.'],
@@ -272,7 +272,7 @@ export function Experiment2Page() {
             </div>
           ))}
         </div>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left: Stack Visualization */}
           <div className="space-y-6">
             <motion.div
@@ -597,7 +597,7 @@ export function Experiment2Page() {
       </section>
 
       <section className="px-6 pb-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-3">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

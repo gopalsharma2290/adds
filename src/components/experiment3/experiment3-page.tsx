@@ -437,7 +437,7 @@ export function Experiment3Page() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -484,14 +484,14 @@ export function Experiment3Page() {
 
       {/* Usage Thoughts Panel */}
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Controls */}
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -590,7 +590,7 @@ export function Experiment3Page() {
 
       {/* Visualization Area */}
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Bars Visualization */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -738,7 +738,7 @@ export function Experiment3Page() {
       </section>
 
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -819,7 +819,7 @@ export function Experiment3Page() {
 
       {/* Python Code & Explanation */}
       <section className="px-6 pb-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

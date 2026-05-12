@@ -434,7 +434,7 @@ export function Experiment1Page() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -481,14 +481,14 @@ export function Experiment1Page() {
 
       {/* Usage Thoughts Panel */}
       <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Animated Data Pipeline */}
       <section className="px-6 pb-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
             {pipelineSteps.map((step, i) => (
               <div key={step.id} className="flex items-center gap-2 flex-shrink-0">
@@ -526,7 +526,7 @@ export function Experiment1Page() {
 
       {/* Main Content Grid */}
       <section className="px-6 pb-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-6">
             {/* Dataset Preview */}
@@ -1056,7 +1056,7 @@ export function Experiment1Page() {
 
       {/* Complexity & Learning Notes */}
       <section className="px-6 pb-16">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

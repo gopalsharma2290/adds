@@ -73,22 +73,24 @@ export function HomePage() {
       <motion.section
         ref={heroRef}
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen overflow-hidden bg-stone-200"
+        className="relative min-h-screen overflow-hidden bg-[#f4eee6]"
       >
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2400&q=85')",
+            background:
+              'linear-gradient(135deg, #f6efe7 0%, #efd8cd 28%, #dce6dc 58%, #d9e3ef 100%)',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-900/10 to-slate-950/60" />
         <div
-          className="absolute inset-0 opacity-35 mix-blend-soft-light"
+          className="absolute inset-0 opacity-90"
           style={{
-            backgroundImage: 'linear-gradient(105deg, rgba(255,255,255,0.34) 0 32%, transparent 32% 68%, rgba(255,255,255,0.22) 68% 100%)',
+            background:
+              'linear-gradient(110deg, rgba(255,248,234,0.92) 0 19%, transparent 19% 44%, rgba(228,214,202,0.72) 44% 68%, transparent 68% 100%)',
           }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.34),transparent_28%),radial-gradient(circle_at_82%_68%,rgba(52,211,153,0.22),transparent_26%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.45),transparent_24%),radial-gradient(circle_at_83%_72%,rgba(185,203,221,0.38),transparent_26%),radial-gradient(circle_at_52%_48%,rgba(234,219,207,0.42),transparent_34%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f7f3ee] via-[#f7f3ee]/65 to-transparent" />
 
         {/* Content */}
         <div className="relative z-10 flex min-h-screen flex-col justify-end px-6 pb-8 pt-28 md:px-8">
@@ -108,7 +110,7 @@ export function HomePage() {
             className="relative z-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
           >
             <div>
-              <p className="max-w-[740px] text-[clamp(3.6rem,8vw,8rem)] font-black leading-[0.84] tracking-[-0.065em] text-white">
+              <p className="max-w-[740px] text-[clamp(3.6rem,8vw,8rem)] font-black leading-[0.84] tracking-[-0.065em] text-[#fffdf9]">
                 visualize<br />the workflow
               </p>
               <div className="mt-5 flex gap-24" aria-hidden="true">
