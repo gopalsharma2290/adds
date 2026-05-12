@@ -590,7 +590,7 @@ export function Experiment3Page() {
 
       {/* Visualization Area */}
       <section className="px-4 pb-6 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 items-start gap-6 lg:grid-cols-3">
           {/* Bars Visualization */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -602,7 +602,7 @@ export function Experiment3Page() {
               <h3 className="text-sm font-semibold text-slate-950">Sorting Visualization</h3>
             </div>
 
-            <div className="mx-[-4px] flex h-52 items-end justify-center gap-1 overflow-x-auto rounded-xl border-0 bg-slate-50/65 px-2 py-3 sm:mx-0 sm:h-64 sm:gap-2 sm:border sm:border-slate-200 sm:bg-transparent sm:px-4 sm:py-0">
+            <div className="mx-[-4px] flex h-[30rem] items-end justify-center gap-1 overflow-x-auto rounded-xl border-0 bg-slate-50/65 px-2 py-8 sm:mx-0 sm:h-[34rem] sm:gap-2 sm:border sm:border-slate-200 sm:bg-transparent sm:px-4 sm:py-8">
               <AnimatePresence>
                 {array.map((bar, index) => (
                   <motion.div

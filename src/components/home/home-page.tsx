@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useAppStore, type PageId } from '@/stores/app-store'
-import { BarChart3, Layers, ArrowUpDown, ChevronRight, Code2, Cpu, Database, Zap } from 'lucide-react'
+import { BarChart3, Layers, ArrowUpDown, ChevronRight, Code2, Cpu, Database, Zap, CheckCircle2 } from 'lucide-react'
 import { useRef } from 'react'
 
 const experiments = [
@@ -73,68 +73,128 @@ export function HomePage() {
       <motion.section
         ref={heroRef}
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen overflow-hidden bg-[#f4eee6]"
+        className="relative min-h-screen overflow-hidden bg-[#fbfaf7]"
       >
+        <div className="absolute inset-y-0 right-0 hidden w-12 bg-[#95f0bd] lg:block" />
         <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(138deg, #f7efe5 0%, #edd7cb 24%, #d8e4dc 56%, #d4dfee 100%)',
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-95"
-          style={{
-            background:
-              'linear-gradient(112deg, rgba(255,250,242,0.92) 0 18%, transparent 18% 42%, rgba(227,214,201,0.75) 42% 68%, transparent 68% 100%)',
-          }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,255,255,0.48),transparent_24%),radial-gradient(circle_at_83%_72%,rgba(185,203,221,0.42),transparent_26%),radial-gradient(circle_at_52%_48%,rgba(234,219,207,0.46),transparent_34%)]" />
-        <div
-          className="absolute inset-0 opacity-50 mix-blend-soft-light"
+          className="absolute inset-0 opacity-[0.24]"
           style={{
             backgroundImage:
-              'radial-gradient(rgba(255,255,255,0.6) 0.7px, transparent 0.7px), radial-gradient(rgba(125,148,170,0.18) 0.7px, transparent 0.7px)',
-            backgroundSize: '18px 18px, 26px 26px',
-            backgroundPosition: '0 0, 9px 11px',
+              'radial-gradient(rgba(6,44,38,0.22) 0.8px, transparent 0.8px)',
+            backgroundSize: '14px 14px',
           }}
         />
-        <div className="absolute left-[10%] top-[16%] h-48 w-48 rounded-full bg-white/35 blur-3xl sm:h-64 sm:w-64" />
-        <div className="absolute right-[12%] top-[28%] h-56 w-56 rounded-full bg-[#d7e3ec]/60 blur-3xl sm:h-72 sm:w-72" />
-        <div className="absolute left-[18%] bottom-[20%] h-44 w-44 rounded-full bg-[#efdccf]/55 blur-3xl sm:h-56 sm:w-56" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f7f3ee] via-[#f7f3ee]/65 to-transparent" />
 
         {/* Content */}
-        <div className="relative z-10 flex min-h-[680px] flex-col justify-end px-6 pb-10 pt-24 sm:min-h-screen sm:px-8 md:px-10 lg:px-14">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-            className="pointer-events-none absolute left-6 right-6 top-24 text-[5.8rem] font-black leading-none text-slate-950/[0.08] sm:top-20 sm:text-[8.5rem] md:left-8 md:right-8 md:top-16 md:text-[12rem] lg:left-14 lg:right-14 lg:text-[16rem] xl:text-[19rem]"
-          >
-            ADDS
-          </motion.h1>
-
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-5 pb-8 pt-24 sm:px-8 md:px-10 lg:px-14">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.7 }}
-            className="relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8"
+            transition={{ delay: 0.16, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            className="grid flex-1 items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]"
           >
-            <div className="min-w-0 rounded-[32px] border border-white/35 bg-white/18 p-4 shadow-[0_18px_60px_rgba(94,84,70,0.08)] backdrop-blur-[22px] sm:max-w-[820px] sm:p-6">
-              <p className="max-w-[760px] text-5xl font-black leading-[0.92] text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl">
-                visualize<br />the workflow
+            <div className="relative z-20 min-w-0">
+              <div className="mb-8 inline-flex rounded-lg bg-[#d9fee8] px-3 py-2 text-xs font-black uppercase text-[#062c26] shadow-[0_10px_30px_rgba(8,47,34,0.08)] sm:text-sm">
+                Algorithms for visual learners
+              </div>
+              <h1 className="max-w-6xl text-[clamp(4rem,13.5vw,10.5rem)] font-black uppercase leading-[0.78] text-[#062c26]">
+                Tackle data<br />structures together
+              </h1>
+              <p className="mt-5 max-w-xl text-base font-semibold leading-7 text-slate-700 sm:mt-7">
+                ADDS Lab turns analysis, stack memory, and sorting behavior into visual workflows you can actually follow.
               </p>
-              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-800/80 sm:text-base">
-                Interactive data, stack, and sorting experiments built for clear hands-on learning.
-              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={() => setCurrentPage('experiment-1')}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#062c26] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_34px_rgba(6,44,38,0.18)] transition-transform hover:scale-105"
+                >
+                  Start analysis
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setCurrentPage('experiment-3')}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[#062c26]/55 bg-white/60 px-7 py-3.5 text-sm font-black text-[#062c26] backdrop-blur-md transition-transform hover:scale-105"
+                >
+                  Compare sorting
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-            <button
-              onClick={() => setCurrentPage('experiment-1')}
-              className="mb-2 w-full rounded-full bg-slate-950 px-8 py-4 text-sm font-black text-white shadow-[0_12px_40px_rgba(15,23,42,0.18)] transition-transform hover:scale-105 sm:w-fit"
-            >
-              start analysis
-            </button>
+
+            <div className="relative z-10 mx-auto w-full max-w-[460px] lg:max-w-[520px]">
+              <div className="absolute -left-10 top-28 hidden text-center font-mono text-xs uppercase tracking-wide text-slate-500 md:block">
+                <span>click to</span>
+                <br />
+                <span>step through</span>
+                <span className="ml-2 text-lg">→</span>
+              </div>
+              <div className="relative overflow-hidden rounded-[2rem] bg-[#d9fee8] p-5 shadow-[0_28px_80px_rgba(6,44,38,0.14)]">
+                <div className="absolute inset-0 opacity-35 mix-blend-multiply [background-image:radial-gradient(rgba(6,44,38,0.22)_0.8px,transparent_0.8px)] [background-size:13px_13px]" />
+                <div className="relative rounded-[1.5rem] border border-[#062c26]/15 bg-white/70 p-4 backdrop-blur-xl">
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-xs font-black uppercase text-[#062c26]">Live workspace</p>
+                    <div className="flex gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-[#062c26]" />
+                      <span className="h-2 w-2 rounded-full bg-lavender" />
+                      <span className="h-2 w-2 rounded-full bg-gold" />
+                    </div>
+                  </div>
+                  <div className="grid gap-3">
+                    <div className="rounded-2xl bg-[#f8ff5a] p-4 text-[#062c26]">
+                      <div className="mb-3 flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4" />
+                        <span className="text-xs font-black uppercase">DataFrame filters</span>
+                      </div>
+                      <div className="flex h-24 items-end gap-2">
+                        {[42, 78, 55, 90, 66, 38].map((height, index) => (
+                          <span
+                            key={index}
+                            className="flex-1 rounded-t bg-[#062c26]"
+                            style={{ height: `${height}%` }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl bg-white p-4">
+                        <Layers className="mb-3 h-5 w-5 text-gold" />
+                        <p className="text-[10px] font-black uppercase text-slate-500">Stack pointer</p>
+                        <p className="mt-1 text-3xl font-black text-[#062c26]">0x04</p>
+                      </div>
+                      <div className="rounded-2xl bg-white p-4">
+                        <ArrowUpDown className="mb-3 h-5 w-5 text-emerald-500" />
+                        <p className="text-[10px] font-black uppercase text-slate-500">Sort race</p>
+                        <p className="mt-1 text-3xl font-black text-[#062c26]">4x</p>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl bg-[#caa5ff] p-4 text-[#062c26]">
+                      <p className="text-xs font-black uppercase">Python runs in your browser</p>
+                      <div className="mt-3 h-2 rounded-full bg-white/60">
+                        <div className="h-full w-3/4 rounded-full bg-[#062c26]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.42, duration: 0.6 }}
+            className="relative z-20 mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3"
+          >
+            {[
+              'Visualize pandas-style filtering',
+              'See stack memory move',
+              'Race four sorting algorithms',
+            ].map(item => (
+              <div key={item} className="flex items-center gap-3 rounded-xl bg-white/70 px-5 py-4 shadow-[0_12px_34px_rgba(6,44,38,0.07)] backdrop-blur-lg">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#062c26]" />
+                <span className="text-sm font-black uppercase text-[#062c26]">{item}</span>
+              </div>
+            ))}
           </motion.div>
         </div>
       </motion.section>
