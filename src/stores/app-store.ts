@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type PageId = 'home' | 'experiment-1' | 'experiment-2' | 'experiment-3' | 'about' | 'viva-prep'
+export type PageId = 'home' | 'experiment-1' | 'experiment-2' | 'experiment-3'
 
 interface AppState {
   currentPage: PageId

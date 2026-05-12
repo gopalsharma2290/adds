@@ -115,47 +115,57 @@ const sampleTableData = (() => {
   })
 })()
 
+import { UsageThoughts } from '@/components/ui/usage-thoughts'
+
 export function Experiment1Page() {
   const { setCurrentPage } = useAppStore()
   const { pyodide, loading: pyodideLoading, runCode, output, isRunning } = usePyodide()
   const [code, setCode] = useState(getDefaultCode)
   const [activePipelineStep, setActivePipelineStep] = useState(0)
   const [chartData, setChartData] = useState<Array<{ Brand: string; TotalQuantity: number }>>([])
-  const [explanations, setExplanations] = useState<number>(0)
+  const [thoughts, setThoughts] = useState<string[]>([])
+  const [isThinking, setIsThinking] = useState(false)
   const outputRef = useRef<HTMLDivElement>(null)
 
   const handleRun = useCallback(async () => {
     if (!pyodide || isRunning) return
 
     setChartData([])
-    setExplanations(0)
+    setThoughts([])
+    setIsThinking(true)
     setActivePipelineStep(0)
 
-    for (let i = 0; i < pipelineSteps.length; i++) {
-      await new Promise(r => setTimeout(r, 600))
-      setActivePipelineStep(i + 1)
-      if (i < explanationSteps.length) {
-        setExplanations(i + 1)
-      }
-    }
-
-    const result = await runCode(code)
-
-    try {
-      const chartMatch = result.match(/__CHART_DATA__\n([\s\S]*?)(?:\n|$)/)
-      if (chartMatch) {
-        const jsonStr = chartMatch[1].trim()
-        const parsed = JSON.parse(jsonStr)
-        if (Array.isArray(parsed)) {
-          setChartData(parsed.map((item: Record<string, unknown>) => ({
-            Brand: String(item.Brand || item.brand || ''),
-            TotalQuantity: Number(item.TotalQuantity || item.TotalQty || item.totalquantity || 0),
-          })))
+    const runPipeline = async () => {
+      for (let i = 0; i < pipelineSteps.length; i++) {
+        await new Promise(r => setTimeout(r, 800))
+        setActivePipelineStep(i + 1)
+        if (i < explanationSteps.length) {
+          setThoughts(prev => [...prev, explanationSteps[i].desc])
         }
       }
-    } catch {
-      // Chart data extraction failed, that's okay
     }
+
+    const runExecution = async () => {
+      const result = await runCode(code)
+      try {
+        const chartMatch = result.match(/__CHART_DATA__\n([\s\S]*?)(?:\n|$)/)
+        if (chartMatch) {
+          const jsonStr = chartMatch[1].trim()
+          const parsed = JSON.parse(jsonStr)
+          if (Array.isArray(parsed)) {
+            setChartData(parsed.map((item: Record<string, unknown>) => ({
+              Brand: String(item.Brand || item.brand || ''),
+              TotalQuantity: Number(item.TotalQuantity || item.TotalQty || item.totalquantity || 0),
+            })))
+          }
+        }
+      } catch {
+        // Chart data extraction failed
+      }
+    }
+
+    await Promise.all([runPipeline(), runExecution()])
+    setIsThinking(false)
   }, [pyodide, code, isRunning, runCode])
 
   const chartColors = ['#a78bfa', '#7c3aed', '#d4a574', '#60a5fa', '#34d399']
@@ -198,46 +208,18 @@ export function Experiment1Page() {
             />
           </motion.div>
 
-          {/* Orb 1 - Large primary lavender */}
+          {/* Orbs */}
           <motion.div
             animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.1, 0.95, 1] }}
             transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-20 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
             style={{ background: 'rgba(167,139,250,0.08)' }}
           />
-          {/* Orb 2 - Deep violet */}
           <motion.div
             animate={{ x: [0, -30, 20, 0], y: [0, 40, -20, 0], scale: [1, 1.15, 0.9, 1] }}
             transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute top-10 -left-20 w-[400px] h-[400px] rounded-full blur-[100px]"
             style={{ background: 'rgba(124,58,237,0.06)' }}
-          />
-          {/* Orb 3 - Small pink accent */}
-          <motion.div
-            animate={{ x: [0, 25, -15, 0], y: [0, -35, 10, 0], scale: [1, 1.2, 0.85, 1] }}
-            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/3 right-10 w-[300px] h-[300px] rounded-full blur-[80px]"
-            style={{ background: 'rgba(192,132,252,0.07)' }}
-          />
-
-          {/* Floating decorative elements */}
-          <motion.div
-            animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-8 right-[15%] w-3 h-3 border rotate-45"
-            style={{ borderColor: 'rgba(167,139,250,0.2)' }}
-          />
-          <motion.div
-            animate={{ y: [0, 12, 0], x: [0, -8, 0] }}
-            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/2 right-[30%] w-2 h-2 rounded-full"
-            style={{ background: 'rgba(167,139,250,0.15)' }}
-          />
-          <motion.div
-            animate={{ y: [0, -20, 0], rotate: [0, 90, 0] }}
-            transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-1/4 left-[10%] w-4 h-4 rounded-sm"
-            style={{ border: '1px solid rgba(192,132,252,0.12)' }}
           />
         </div>
 
@@ -283,6 +265,13 @@ export function Experiment1Page() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Usage Thoughts Panel */}
+      <section className="px-6 pb-6">
+        <div className="max-w-6xl mx-auto">
+          <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
@@ -490,40 +479,6 @@ export function Experiment1Page() {
                   <div className="h-full flex items-center justify-center text-muted-foreground/30 text-sm">
                     Run code to generate chart
                   </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Step-by-Step Explanations */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="rounded-2xl glass p-5"
-            >
-              <h3 className="text-sm font-semibold text-cream mb-4">Step-by-Step Breakdown</h3>
-              <div className="space-y-3">
-                <AnimatePresence>
-                  {explanationSteps.slice(0, explanations).map((step, i) => (
-                    <motion.div
-                      key={step.step}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1, duration: 0.4 }}
-                      className="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]"
-                    >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-lavender/10 text-lavender text-[10px] font-bold flex items-center justify-center">
-                        {step.step}
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-cream">{step.title}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{step.desc}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {explanations === 0 && (
-                  <p className="text-xs text-muted-foreground/30 italic">Run the code to see explanations...</p>
                 )}
               </div>
             </motion.div>

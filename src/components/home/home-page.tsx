@@ -283,7 +283,10 @@ export function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-gold/80 to-lavender-glow opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </motion.button>
             <motion.button
-              onClick={() => setCurrentPage('about')}
+              onClick={() => {
+                const element = document.getElementById('experiments-section')
+                element?.scrollIntoView({ behavior: 'smooth' })
+              }}
               whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(167,139,250,0.15), inset 0 0 30px rgba(167,139,250,0.05)' }}
               whileTap={{ scale: 0.97 }}
               className="group relative px-8 py-3.5 rounded-xl glass text-cream/80 font-medium text-sm tracking-wide hover:text-cream transition-all duration-300 overflow-hidden"
@@ -313,7 +316,7 @@ export function HomePage() {
       </motion.section>
 
       {/* Experiment Cards Section */}
-      <section className="relative px-6 py-24">
+      <section id="experiments-section" className="relative px-6 py-24">
         <div className="max-w-6xl mx-auto">
           <motion.div
             variants={stagger}

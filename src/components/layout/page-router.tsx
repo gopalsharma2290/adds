@@ -6,16 +6,12 @@ import { HomePage } from '@/components/home/home-page'
 import { Experiment1Page } from '@/components/experiment1/experiment1-page'
 import { Experiment2Page } from '@/components/experiment2/experiment2-page'
 import { Experiment3Page } from '@/components/experiment3/experiment3-page'
-import { AboutPage } from '@/components/about/about-page'
-import { VivaPrepPage } from '@/components/viva-prep/viva-prep-page'
 
 const pageComponents: Record<string, React.ComponentType> = {
   'home': HomePage,
   'experiment-1': Experiment1Page,
   'experiment-2': Experiment2Page,
   'experiment-3': Experiment3Page,
-  'about': AboutPage,
-  'viva-prep': VivaPrepPage,
 }
 
 export function PageRouter() {

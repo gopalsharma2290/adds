@@ -50,6 +50,8 @@ print(f"\\nSpace Complexity: O(1) — in-place sorting")
 print(f"\\nNote: Python's built-in sort() uses Timsort (O(n log n))")
 `
 
+import { UsageThoughts } from '@/components/ui/usage-thoughts'
+
 export function Experiment3Page() {
   const { setCurrentPage } = useAppStore()
   const { pyodide, loading: pyodideLoading, runCode, output, isRunning: pyodideRunning } = usePyodide()
@@ -61,7 +63,8 @@ export function Experiment3Page() {
   const [comparisons, setComparisons] = useState(0)
   const [swaps, setSwaps] = useState(0)
   const [passes, setPasses] = useState(0)
-  const [currentExplanation, setCurrentExplanation] = useState('')
+  const [thoughts, setThoughts] = useState<string[]>([])
+  const [isThinking, setIsThinking] = useState(false)
   const [sorted, setSorted] = useState(false)
   const [code, setCode] = useState(bubbleSortCode)
   const abortRef = useRef(false)
@@ -79,7 +82,7 @@ export function Experiment3Page() {
     setComparisons(0)
     setSwaps(0)
     setPasses(0)
-    setCurrentExplanation('')
+    setThoughts([])
     setSorted(false)
     const nums = inputText.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n))
     if (nums.length > 0) {
@@ -103,6 +106,7 @@ export function Experiment3Page() {
     setComparisons(0)
     setSwaps(0)
     setPasses(0)
+    setThoughts(["Initializing Bubble Sort algorithm.", "Target: Bubble the largest elements to the end."])
 
     const currentArray = [...array]
     const n = currentArray.length
@@ -111,7 +115,7 @@ export function Experiment3Page() {
       if (abortRef.current) break
       let swapped = false
       setPasses(p => p + 1)
-      setCurrentExplanation(`Pass ${i + 1}: Comparing adjacent elements`)
+      setThoughts(prev => [...prev.slice(-4), `Pass ${i + 1}: Starting scan of unsorted portion.`])
 
       for (let j = 0; j < n - i - 1; j++) {
         if (abortRef.current) break
@@ -122,17 +126,14 @@ export function Experiment3Page() {
           state: idx === j || idx === j + 1 ? 'comparing' : bar.state === 'sorted' ? 'sorted' : 'default'
         })))
         setComparisons(c => c + 1)
-        setCurrentExplanation(`Comparing ${currentArray[j].value} and ${currentArray[j + 1].value}`)
-        await wait(speedMap[speed])
-        if (abortRef.current) break
-
+        
         if (currentArray[j].value > currentArray[j + 1].value) {
+          setThoughts(prev => [...prev.slice(-4), `Found ${currentArray[j].value} > ${currentArray[j + 1].value}. Swapping positions.`])
           // Swap
           setArray(prev => prev.map((bar, idx) => ({
             ...bar,
             state: idx === j || idx === j + 1 ? 'swapping' : bar.state === 'sorted' ? 'sorted' : 'default'
           })))
-          setCurrentExplanation(`${currentArray[j].value} > ${currentArray[j + 1].value}, so swap!`)
           await wait(speedMap[speed] / 2)
 
           // Perform swap
@@ -150,7 +151,11 @@ export function Experiment3Page() {
             return newArr
           })
           await wait(speedMap[speed] / 2)
+        } else {
+          await wait(speedMap[speed])
         }
+
+        if (abortRef.current) break
 
         // Reset states
         setArray(prev => prev.map((bar, idx) => ({
@@ -167,7 +172,7 @@ export function Experiment3Page() {
 
       // Early termination
       if (!swapped) {
-        setCurrentExplanation('No swaps needed — array is already sorted!')
+        setThoughts(prev => [...prev, "No swaps in this pass. Array is now fully sorted!"])
         break
       }
     }
@@ -176,12 +181,14 @@ export function Experiment3Page() {
     setArray(prev => prev.map(bar => ({ ...bar, state: 'sorted' })))
     setSorted(true)
     setSorting(false)
-    setCurrentExplanation('Sorting complete! ✓')
+    setThoughts(prev => [...prev, "Execution complete. Array sorted successfully."])
   }, [array, speed, wait])
 
   const runPythonCode = useCallback(async () => {
     if (!pyodide || pyodideRunning) return
+    setIsThinking(true)
     await runCode(code)
+    setIsThinking(false)
   }, [pyodide, pyodideRunning, code, runCode])
 
   const getBarColor = (state: SortBar['state']) => {
@@ -226,46 +233,12 @@ export function Experiment3Page() {
             />
           </motion.div>
 
-          {/* Orb 1 - Large emerald */}
+          {/* Orbs */}
           <motion.div
             animate={{ x: [0, 30, -25, 0], y: [0, -25, 30, 0], scale: [1, 1.12, 0.9, 1] }}
             transition={{ duration: 19, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-20 right-1/3 w-[500px] h-[500px] rounded-full blur-[120px]"
             style={{ background: 'rgba(52,211,153,0.07)' }}
-          />
-          {/* Orb 2 - Teal */}
-          <motion.div
-            animate={{ x: [0, -25, 30, 0], y: [0, 30, -25, 0], scale: [1, 1.15, 0.88, 1] }}
-            transition={{ duration: 23, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 -left-16 w-[400px] h-[400px] rounded-full blur-[100px]"
-            style={{ background: 'rgba(20,184,166,0.06)' }}
-          />
-          {/* Orb 3 - Small mint highlight */}
-          <motion.div
-            animate={{ x: [0, 20, -15, 0], y: [0, -30, 10, 0], scale: [1, 1.2, 0.82, 1] }}
-            transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/2 right-[15%] w-[280px] h-[280px] rounded-full blur-[80px]"
-            style={{ background: 'rgba(110,231,183,0.06)' }}
-          />
-
-          {/* Floating decorative elements */}
-          <motion.div
-            animate={{ y: [0, -16, 0], rotate: [0, 120, 240] }}
-            transition={{ duration: 19, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-10 right-[25%] w-3 h-3 border rotate-45"
-            style={{ borderColor: 'rgba(52,211,153,0.18)' }}
-          />
-          <motion.div
-            animate={{ y: [0, 10, 0], x: [0, -12, 0] }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-2/3 left-[35%] w-2 h-2 rounded-full"
-            style={{ background: 'rgba(52,211,153,0.14)' }}
-          />
-          <motion.div
-            animate={{ y: [0, -18, 0], rotate: [0, 60, 120] }}
-            transition={{ duration: 21, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-1/4 right-[10%] w-4 h-4 rounded-sm"
-            style={{ border: '1px solid rgba(20,184,166,0.1)' }}
           />
         </div>
 
@@ -311,6 +284,13 @@ export function Experiment3Page() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Usage Thoughts Panel */}
+      <section className="px-6 pb-6">
+        <div className="max-w-6xl mx-auto">
+          <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
@@ -394,16 +374,6 @@ export function Experiment3Page() {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-cream">Sorting Visualization</h3>
-              {currentExplanation && (
-                <motion.span
-                  key={currentExplanation}
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-xs text-muted-foreground"
-                >
-                  {currentExplanation}
-                </motion.span>
-              )}
             </div>
 
             <div className="flex items-end justify-center gap-2 h-64 px-4">
@@ -575,12 +545,6 @@ export function Experiment3Page() {
                 </p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   After each complete pass, the largest unsorted element settles at its correct position. Repeat passes until no more swaps are needed.
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
-                <p className="text-xs font-semibold text-lavender mb-1">Python&apos;s sort() vs Bubble Sort</p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Python uses Timsort (O(n log n)), which is far more efficient than Bubble Sort (O(n²)). Bubble Sort is primarily educational — it helps understand how comparison-based sorting works internally.
                 </p>
               </div>
             </div>

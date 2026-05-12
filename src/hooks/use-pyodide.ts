@@ -11,6 +11,8 @@ declare global {
 interface PyodideInstance {
   runPythonAsync: (code: string) => Promise<string>
   runPython: (code: string) => string
+  loadPackage: (packages: string | string[]) => Promise<void>
+  loadPackagesFromImports: (code: string) => Promise<void>
   globals: Record<string, unknown>
 }
 
@@ -20,6 +22,7 @@ interface UsePyodideReturn {
   error: string | null
   output: string
   runCode: (code: string) => Promise<string>
+  loadPackages: (packages: string[]) => Promise<void>
   isRunning: boolean
 }
 
@@ -54,9 +57,10 @@ export function usePyodide(): UsePyodideReturn {
         })
 
         // Load micropip for package management
+        await pyodideInstance.loadPackage('micropip')
         await pyodideInstance.runPythonAsync(`
 import micropip
-print("Pyodide initialized successfully")
+print("Pyodide initialized successfully with micropip")
 `)
 
         setPyodide(pyodideInstance)
@@ -70,6 +74,16 @@ print("Pyodide initialized successfully")
     initPyodide()
   }, [])
 
+  const loadPackages = useCallback(async (packages: string[]) => {
+    if (!pyodide) return
+    setLoading(true)
+    try {
+      await pyodide.loadPackage(packages)
+    } finally {
+      setLoading(false)
+    }
+  }, [pyodide])
+
   const runCode = useCallback(async (code: string): Promise<string> => {
     if (!pyodide) return 'Pyodide not initialized yet'
     
@@ -77,6 +91,9 @@ print("Pyodide initialized successfully")
     setOutput('')
     
     try {
+      // Automatically load packages from imports
+      await pyodide.loadPackagesFromImports(code)
+
       // Redirect stdout
       await pyodide.runPythonAsync(`
 import sys
@@ -102,5 +119,5 @@ sys.stderr = StringIO()
     }
   }, [pyodide])
 
-  return { pyodide, loading, error, output, runCode, isRunning }
+  return { pyodide, loading, error, output, runCode, loadPackages, isRunning }
 }

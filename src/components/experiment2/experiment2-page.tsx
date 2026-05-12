@@ -58,6 +58,8 @@ function getDefaultStackCode(): string {
   return getStackCode('s.push(10)\ns.push(20)\ns.push(30)')
 }
 
+import { UsageThoughts } from '@/components/ui/usage-thoughts'
+
 export function Experiment2Page() {
   const { setCurrentPage } = useAppStore()
   const { pyodide, loading: pyodideLoading, runCode, output, isRunning } = usePyodide()
@@ -67,6 +69,8 @@ export function Experiment2Page() {
   const [code, setCode] = useState(getDefaultStackCode)
   const [nextId, setNextId] = useState(1)
   const [poppingItem, setPoppingItem] = useState<number | null>(null)
+  const [thoughts, setThoughts] = useState<string[]>([])
+  const [isThinking, setIsThinking] = useState(false)
 
   const pushOp = useCallback(() => {
     const val = parseInt(inputValue)
@@ -75,15 +79,20 @@ export function Experiment2Page() {
     const id = nextId
     setStack(prev => [...prev, { id, value: val }])
     setHistory(prev => [...prev, { id: Date.now(), type: 'push', value: val, timestamp: Date.now() }])
+    setThoughts(prev => [...prev, `Pushing ${val} onto the stack. New top: ${val}.`])
     setNextId(prev => prev + 1)
     setInputValue('')
   }, [inputValue, nextId])
 
   const popOp = useCallback(() => {
-    if (stack.length === 0) return
+    if (stack.length === 0) {
+      setThoughts(prev => [...prev, "Cannot pop from an empty stack!"])
+      return
+    }
 
     const topItem = stack[stack.length - 1]
     setPoppingItem(topItem.id)
+    setThoughts(prev => [...prev, `Popping ${topItem.value} from the top. LIFO principle applied.`])
 
     setTimeout(() => {
       setStack(prev => prev.slice(0, -1))
@@ -93,20 +102,26 @@ export function Experiment2Page() {
   }, [stack])
 
   const peekOp = useCallback(() => {
-    if (stack.length === 0) return
+    if (stack.length === 0) {
+      setThoughts(prev => [...prev, "Stack is empty, nothing to peek."])
+      return
+    }
     const topItem = stack[stack.length - 1]
     setHistory(prev => [...prev, { id: Date.now(), type: 'peek', value: topItem.value, timestamp: Date.now() }])
+    setThoughts(prev => [...prev, `Peeking at the top element: ${topItem.value}.`])
   }, [stack])
 
   const reset = useCallback(() => {
     setStack([])
     setHistory([])
+    setThoughts([])
     setInputValue('')
     setCode(getDefaultStackCode())
   }, [])
 
   const runStackCode = useCallback(async () => {
     if (!pyodide || isRunning) return
+    setIsThinking(true)
     const ops = history.map(h => {
       if (h.type === 'push') return `s.push(${h.value})`
       if (h.type === 'pop') return `s.pop()`
@@ -115,6 +130,7 @@ export function Experiment2Page() {
     const codeToRun = getStackCode(ops || 's.push(10)')
     setCode(codeToRun)
     await runCode(codeToRun)
+    setIsThinking(false)
   }, [pyodide, isRunning, history, runCode])
 
   return (
@@ -148,46 +164,12 @@ export function Experiment2Page() {
             />
           </motion.div>
 
-          {/* Orb 1 - Large warm gold */}
+          {/* Orbs */}
           <motion.div
             animate={{ x: [0, -35, 25, 0], y: [0, 25, -30, 0], scale: [1, 1.12, 0.92, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-16 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
             style={{ background: 'rgba(212,165,116,0.07)' }}
-          />
-          {/* Orb 2 - Deep amber */}
-          <motion.div
-            animate={{ x: [0, 25, -30, 0], y: [0, -35, 15, 0], scale: [1, 1.1, 0.88, 1] }}
-            transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 -right-20 w-[400px] h-[400px] rounded-full blur-[100px]"
-            style={{ background: 'rgba(180,120,60,0.06)' }}
-          />
-          {/* Orb 3 - Small warm highlight */}
-          <motion.div
-            animate={{ x: [0, 20, -10, 0], y: [0, -20, 15, 0], scale: [1, 1.25, 0.8, 1] }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/3 left-[60%] w-[280px] h-[280px] rounded-full blur-[80px]"
-            style={{ background: 'rgba(245,198,130,0.06)' }}
-          />
-
-          {/* Floating decorative elements */}
-          <motion.div
-            animate={{ y: [0, -18, 0], rotate: [0, 90, 180] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-12 left-[20%] w-3 h-3 border rotate-12"
-            style={{ borderColor: 'rgba(212,165,116,0.18)' }}
-          />
-          <motion.div
-            animate={{ y: [0, 14, 0], x: [0, 10, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-2/3 right-[20%] w-2 h-2 rounded-full"
-            style={{ background: 'rgba(212,165,116,0.14)' }}
-          />
-          <motion.div
-            animate={{ y: [0, -12, 0], rotate: [45, 135, 45] }}
-            transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-1/3 left-[8%] w-4 h-4"
-            style={{ border: '1px solid rgba(180,120,60,0.1)' }}
           />
         </div>
 
@@ -233,6 +215,13 @@ export function Experiment2Page() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Usage Thoughts Panel */}
+      <section className="px-6 pb-6">
+        <div className="max-w-6xl mx-auto">
+          <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
@@ -463,36 +452,6 @@ export function Experiment2Page() {
                     </motion.div>
                   ))}
                 </AnimatePresence>
-              </div>
-            </motion.div>
-
-            {/* Educational Cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="rounded-2xl glass p-5"
-            >
-              <h3 className="text-sm font-semibold text-cream mb-4">Understanding Stacks</h3>
-              <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
-                  <p className="text-xs font-semibold text-gold mb-1">What is LIFO?</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Last In, First Out — the last element pushed onto the stack is the first one to be popped. Like a stack of plates: you always take the top one.
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
-                  <p className="text-xs font-semibold text-lavender mb-1">Real-World Uses</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Browser back button (history stack), undo operations in editors, function call stack in programming, expression evaluation.
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.03]">
-                  <p className="text-xs font-semibold text-emerald-400 mb-1">Time Complexity</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Push: O(1) — add to end. Pop: O(1) — remove from end. Peek: O(1) — access last element. All operations are constant time.
-                  </p>
-                </div>
               </div>
             </motion.div>
           </div>

@@ -19,8 +19,6 @@ const navItems: { id: PageId; label: string; icon: React.ReactNode; section?: st
   { id: 'experiment-1', label: 'Data Analysis', icon: <BarChart3 className="w-4 h-4" />, section: 'Experiments' },
   { id: 'experiment-2', label: 'Stack', icon: <Layers className="w-4 h-4" />, section: 'Experiments' },
   { id: 'experiment-3', label: 'Bubble Sort', icon: <ArrowUpDown className="w-4 h-4" />, section: 'Experiments' },
-  { id: 'about', label: 'About', icon: <Info className="w-4 h-4" /> },
-  { id: 'viva-prep', label: 'Viva Prep', icon: <BookOpen className="w-4 h-4" /> },
 ]
 
 export function Sidebar() {
