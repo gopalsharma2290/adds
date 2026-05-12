@@ -6,6 +6,7 @@ import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { ArrowUpDown, Play, Pause, RotateCcw, SkipForward, Loader2, Zap, GitCompare, ArrowLeftRight, Trophy } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 interface SortBar {
   id: number
@@ -400,7 +401,7 @@ export function Experiment3Page() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-12 overflow-hidden">
+      <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated grid overlay */}
           <div
@@ -455,16 +456,16 @@ export function Experiment3Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400"
+                className="flex items-center justify-center"
               >
-                <ArrowUpDown className="w-5 h-5" />
+                <Soft3DIcon variant="sort" size="md" />
               </motion.div>
               <div>
                 <motion.h1
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-slate-950"
+                  className="text-2xl font-bold text-slate-950 sm:text-3xl md:text-4xl"
                 >
                   Bubble Sort Visualization
                 </motion.h1>
@@ -483,14 +484,14 @@ export function Experiment3Page() {
       </section>
 
       {/* Usage Thoughts Panel */}
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Controls */}
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -498,7 +499,7 @@ export function Experiment3Page() {
             transition={{ delay: 0.2 }}
             className="rounded-2xl glass p-5"
           >
-            <div className="flex flex-wrap items-center gap-3 mb-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <input
                 type="text"
                 value={inputText}
@@ -506,9 +507,9 @@ export function Experiment3Page() {
                 onKeyDown={(e) => e.key === 'Enter' && applyInput()}
                 disabled={sorting}
                 placeholder="e.g. 5, 3, 8, 1, 9"
-                className="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-emerald-500/30 transition-colors disabled:opacity-50"
+                className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-950 transition-colors focus:border-emerald-500/30 focus:outline-none disabled:opacity-50"
               />
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex">
                 <motion.button
                   onClick={() => applyInput()}
                   disabled={sorting}
@@ -516,7 +517,7 @@ export function Experiment3Page() {
                   transition={{ duration: 0.8, repeat: inputDirty ? Infinity : 0 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold hover:text-emerald-600 transition-colors disabled:opacity-50"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-emerald-600 disabled:opacity-50"
                 >
                   Apply
                 </motion.button>
@@ -525,7 +526,7 @@ export function Experiment3Page() {
                     onClick={startSort}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold glow-green hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] flex items-center gap-1.5"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2 text-sm font-semibold text-white glow-green hover:shadow-[0_0_30px_rgba(52,211,153,0.3)]"
                   >
                     <Play className="w-3.5 h-3.5" /> Sort
                   </motion.button>
@@ -534,7 +535,7 @@ export function Experiment3Page() {
                     onClick={() => setPaused(!paused)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-5 py-2 rounded-lg bg-yellow-500/20 text-yellow-400 text-sm font-semibold flex items-center gap-1.5"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-yellow-500/20 px-5 py-2 text-sm font-semibold text-yellow-400"
                   >
                     {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                     {paused ? 'Resume' : 'Pause'}
@@ -544,13 +545,13 @@ export function Experiment3Page() {
                   onClick={reset}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-slate-950 transition-colors flex items-center gap-1.5"
+                  className="col-span-2 flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors glass hover:text-slate-950 sm:col-span-1"
                 >
                   <RotateCcw className="w-3.5 h-3.5" /> Reset
                 </motion.button>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <span className="text-xs text-muted-foreground">Speed:</span>
               {(['slow', 'medium', 'fast'] as SpeedMode[]).map(s => (
                 <button
@@ -589,20 +590,20 @@ export function Experiment3Page() {
       </section>
 
       {/* Visualization Area */}
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Bars Visualization */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="lg:col-span-2 rounded-2xl glass p-6"
+            className="rounded-2xl p-4 glass sm:p-6 lg:col-span-2"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-slate-950">Sorting Visualization</h3>
             </div>
 
-            <div className="flex items-end justify-center gap-2 h-64 px-4">
+            <div className="flex h-56 items-end justify-center gap-1 overflow-x-auto px-1 sm:h-64 sm:gap-2 sm:px-4">
               <AnimatePresence>
                 {array.map((bar, index) => (
                   <motion.div
@@ -613,7 +614,7 @@ export function Experiment3Page() {
                       height: `${(bar.value / maxVal) * 100}%`,
                       transition: { type: 'spring', stiffness: 300, damping: 30 },
                     }}
-                    className={`relative flex-1 max-w-[60px] rounded-t-lg transition-colors duration-200 ${getBarColor(bar.state)}`}
+                    className={`relative min-w-7 flex-1 max-w-[60px] rounded-t-lg transition-colors duration-200 ${getBarColor(bar.state)}`}
                   >
                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-mono">
                       {bar.value}
@@ -624,7 +625,7 @@ export function Experiment3Page() {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-6 mt-6 text-[10px] text-muted-foreground">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-[10px] text-muted-foreground sm:gap-6">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-sm bg-lavender/60" />
                 <span>Unsorted</span>
@@ -737,7 +738,7 @@ export function Experiment3Page() {
         </div>
       </section>
 
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -818,7 +819,7 @@ export function Experiment3Page() {
       </section>
 
       {/* Python Code & Explanation */}
-      <section className="px-6 pb-16">
+      <section className="px-4 pb-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

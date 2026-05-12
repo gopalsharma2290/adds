@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { Layers, Play, Plus, Minus, Eye, RotateCcw, Loader2, ArrowDown, ArrowUp, Zap, CheckCircle, BarChart3, BookOpen } from 'lucide-react'
+import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 interface StackItem {
   id: number
@@ -167,7 +168,7 @@ export function Experiment2Page() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-12 overflow-hidden">
+      <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated grid overlay */}
           <div
@@ -222,16 +223,16 @@ export function Experiment2Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold"
+                className="flex items-center justify-center"
               >
-                <Layers className="w-5 h-5" />
+                <Soft3DIcon variant="stack" size="md" />
               </motion.div>
               <div>
                 <motion.h1
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-slate-950"
+                  className="text-2xl font-bold text-slate-950 sm:text-3xl md:text-4xl"
                 >
                   Stack Data Structure
                 </motion.h1>
@@ -250,14 +251,14 @@ export function Experiment2Page() {
       </section>
 
       {/* Usage Thoughts Panel */}
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="px-6 pb-8">
+      <section className="px-4 pb-8 sm:px-6 lg:px-8">
         <div className="mx-auto mb-6 grid max-w-[1480px] grid-cols-1 gap-3 md:grid-cols-4">
           {[
             ['1', 'Enter values', 'Single number or comma-separated batch.'],
@@ -279,7 +280,7 @@ export function Experiment2Page() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-2xl glass p-6"
+              className="rounded-2xl p-4 glass sm:p-6"
             >
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
@@ -368,7 +369,7 @@ export function Experiment2Page() {
               </div>
 
               {/* Size indicator */}
-              <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground sm:gap-4">
                 <span>Size: <span className="text-slate-950 font-semibold">{stack.length}</span></span>
                 <span>•</span>
                 <span>Visual capacity: <span className="text-slate-950 font-semibold">{stack.length}/{maxVisualCapacity}</span></span>
@@ -404,20 +405,20 @@ export function Experiment2Page() {
             >
               <h3 className="text-sm font-semibold text-slate-950 mb-1">Interact with the Stack</h3>
               <p className="text-xs text-muted-foreground mb-4">Enter a value, or several values separated by commas, and push them onto the stack.</p>
-              <div className="flex gap-2 mb-4">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && pushOp()}
                   placeholder="Value or batch: 10, 20, 30"
-                  className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-gold/30 transition-colors"
+                  className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 transition-colors focus:border-gold/30 focus:outline-none"
                 />
                 <motion.button
                   onClick={pushOp}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-5 py-3 rounded-xl bg-gold/10 text-gold text-sm font-semibold hover:bg-gold/20 transition-colors flex items-center gap-1.5"
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-gold/10 px-5 py-3 text-sm font-semibold text-gold transition-colors hover:bg-gold/20"
                 >
                   <Plus className="w-3.5 h-3.5" /> Push
                 </motion.button>
@@ -438,13 +439,13 @@ export function Experiment2Page() {
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex">
                 <motion.button
                   onClick={popOp}
                   disabled={stack.length === 0}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-1 px-4 py-2 rounded-lg bg-red-500/10 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-1.5 rounded-lg bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-30 sm:flex-1"
                 >
                   <Minus className="w-3.5 h-3.5" /> Pop
                 </motion.button>
@@ -453,7 +454,7 @@ export function Experiment2Page() {
                   disabled={stack.length === 0}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-1 px-4 py-2 rounded-lg bg-lavender/10 text-lavender text-sm font-medium hover:bg-lavender/20 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-1.5 rounded-lg bg-lavender/10 px-4 py-2 text-sm font-medium text-lavender transition-colors hover:bg-lavender/20 disabled:cursor-not-allowed disabled:opacity-30 sm:flex-1"
                 >
                   <Eye className="w-3.5 h-3.5" /> Peek
                 </motion.button>
@@ -461,7 +462,7 @@ export function Experiment2Page() {
                   onClick={reset}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg glass text-muted-foreground text-sm hover:text-slate-950 transition-colors flex items-center gap-1.5"
+                  className="col-span-2 flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors glass hover:text-slate-950 sm:col-span-1"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                 </motion.button>
@@ -528,7 +529,7 @@ export function Experiment2Page() {
               className="rounded-2xl glass p-5"
             >
               <h3 className="text-sm font-semibold text-slate-950 mb-4">Operation History</h3>
-              <div className="grid grid-cols-4 gap-2 mb-4">
+              <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {[
                   ['Push', operationStats.pushes, 'text-gold'],
                   ['Pop', operationStats.pops, 'text-red-400'],
@@ -596,7 +597,7 @@ export function Experiment2Page() {
         </div>
       </section>
 
-      <section className="px-6 pb-16">
+      <section className="px-4 pb-16 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-3">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -1,7 +1,8 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Brain, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 interface UsageThoughtsProps {
   thoughts: string[]
@@ -22,7 +23,7 @@ export function UsageThoughts({ thoughts, visible, isThinking = false }: UsageTh
           <div className="rounded-2xl glass p-5 border-lavender/20">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-slate-950 flex items-center gap-2">
-                <Brain className="w-4 h-4 text-lavender" />
+                <Soft3DIcon variant="motion" size="sm" className="scale-75" />
                 Usage Thoughts
               </h3>
               {isThinking && (
@@ -67,7 +68,7 @@ export function UsageThoughts({ thoughts, visible, isThinking = false }: UsageTh
             
             <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-3 h-3 text-gold/40" />
+                <Soft3DIcon variant="stack" size="sm" className="scale-[0.55]" />
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground/40 font-medium">Agentic Insight</span>
               </div>
               <div className="flex gap-1">

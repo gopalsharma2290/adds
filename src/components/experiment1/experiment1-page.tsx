@@ -6,6 +6,7 @@ import { useAppStore } from '@/stores/app-store'
 import { usePyodide } from '@/hooks/use-pyodide'
 import { BarChart3, Play, Upload, Download, ChevronRight, Database, Filter, Group, TrendingUp, AlertCircle, Loader2, RotateCcw, CopyX, ArrowUpDown, PieChart as PieChartIcon, Activity as ActivityIcon } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
+import { Soft3DIcon } from '@/components/ui/soft-3d-icon'
 
 const sampleCSV = `Product,Brand,Price,Quantity,Category,Rating,Discount,InStock
 T-Shirt,Nike,899,18,Apparel,4.4,10,Yes
@@ -391,7 +392,7 @@ export function Experiment1Page() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-12 overflow-hidden">
+      <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated grid overlay */}
           <div
@@ -452,16 +453,16 @@ export function Experiment1Page() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="w-10 h-10 rounded-xl bg-lavender/10 flex items-center justify-center text-lavender"
+                className="flex items-center justify-center"
               >
-                <BarChart3 className="w-5 h-5" />
+                <Soft3DIcon variant="data" size="md" />
               </motion.div>
               <div>
                 <motion.h1
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
-                  className="text-3xl md:text-4xl font-bold text-slate-950"
+                  className="text-2xl font-bold text-slate-950 sm:text-3xl md:text-4xl"
                 >
                   Data Analysis &amp; Visualization
                 </motion.h1>
@@ -480,14 +481,14 @@ export function Experiment1Page() {
       </section>
 
       {/* Usage Thoughts Panel */}
-      <section className="px-6 pb-6">
+      <section className="px-4 pb-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <UsageThoughts thoughts={thoughts} visible={thoughts.length > 0 || isThinking} isThinking={isThinking} />
         </div>
       </section>
 
       {/* Animated Data Pipeline */}
-      <section className="px-6 pb-8">
+      <section className="px-4 pb-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
             {pipelineSteps.map((step, i) => (
@@ -525,7 +526,7 @@ export function Experiment1Page() {
       </section>
 
       {/* Main Content Grid */}
-      <section className="px-6 pb-8">
+      <section className="px-4 pb-8 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-6">
@@ -663,8 +664,8 @@ export function Experiment1Page() {
                   </div>
                 </div>
               </div>
-              <div className="max-h-64 overflow-y-auto rounded-lg border border-slate-200">
-                <table className="w-full text-xs">
+              <div className="max-h-64 overflow-auto rounded-lg border border-slate-200">
+                <table className="min-w-[720px] w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-200">
                       {headers.map(h => (
@@ -1055,7 +1056,7 @@ export function Experiment1Page() {
       </section>
 
       {/* Complexity & Learning Notes */}
-      <section className="px-6 pb-16">
+      <section className="px-4 pb-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1480px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
